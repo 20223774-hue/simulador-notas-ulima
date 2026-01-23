@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulador de Notas ULima</title>
+
+  <style>
+    :root{
+      --bg:#f3f5fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --shadow:0 16px 40px rgba(15,23,42,.10);
+      --shadow2:0 10px 24px rgba(15,23,42,.08);
+      --radius:18px;
+
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+      --ok:#16a34a;
+      --bad:#dc2626;
+
+      --tableHead:#f8fafc;
+      --rowA:#ffffff;
+      --rowB:#f8fafc;
+      --hover:#eef2ff;
+
+      --pillBg:#eef2ff;
+      --pillText:#3730a3;
+      --focus: rgba(59,130,246,.18);
+    }
+
+    html[data-theme="dark"]{
+      --bg:#0b1020;
+      --card:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#223048;
+      --shadow:0 16px 40px rgba(0,0,0,.45);
+      --shadow2:0 10px 24px rgba(0,0,0,.35);
+
+      --primary:#60a5fa;
+      --primary2:#3b82f6;
+      --ok:#34d399;
+      --bad:#fb7185;
+
+      --tableHead:#0b1220;
+      --rowA:#0f172a;
+      --rowB:#0b1220;
+      --hover:#111c33;
+
+      --pillBg:#111c33;
+      --pillText:#c7d2fe;
+      --focus: rgba(96,165,250,.18);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      padding:24px;
+      color:var(--text);
+    }
+
+    .box{
+      max-width:1200px;
+      margin:auto;
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:18px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    h2{ margin:0; font-size:22px; }
+    .subtitle{ font-size:13px; color:var(--muted); margin-top:6px; line-height:1.35; }
+    .creator{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+    .hint{
+      margin-top:14px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .controls{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow2);
+    }
+
+    label{
+      font-size:13px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+
+    input{
+      width:120px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:transparent;
+      color:var(--text);
+      font-weight:600;
+    }
+
+    /* iPhone: evita zoom al tocar inputs */
+    input, button { font-size:16px; }
+
+    input:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px var(--focus);
+    }
+
+    button{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:transparent;
+      cursor:pointer;
+      font-weight:800;
+      color:var(--text);
+      transition: transform .08s ease, background .12s ease, border-color .12s ease;
+    }
+
+    button:hover{ transform: translateY(-1px); }
+    button:active{ transform: translateY(0); }
+
+    .btn-primary{
+      background:var(--primary);
+      border-color:var(--primary);
+      color:white;
+    }
+    .btn-primary:hover{ background:var(--primary2); border-color:var(--primary2); }
+
+    .btn-ghost{ opacity:.85; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      margin-top:14px;
+      align-items:start;
+    }
+
+    .tableWrap{
+      overflow:auto;
+      border-radius:16px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      margin-top:12px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      overflow:hidden;
+      min-width: 520px; /* ayuda al scroll en móvil */
+    }
+
+    th, td{
+      padding:10px;
+      font-size:13px;
+      border-bottom:1px solid var(--border);
+      text-align:center;
+      white-space:nowrap;
+    }
+
+    th{
+      background:var(--tableHead);
+      font-weight:900;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tbody tr:nth-child(odd) td{ background:var(--rowA); }
+    tbody tr:nth-child(even) td{ background:var(--rowB); }
+    tbody tr:hover td{ background:var(--hover); }
+
+    .ok{ color:var(--ok); font-weight:900; }
+    .bad{ color:var(--bad); font-weight:900; }
+
+    .pill{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      background:var(--pillBg);
+      color:var(--pillText);
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    /* ✅ Responsive para celular */
+    @media (max-width: 900px){
+      body{ padding:14px; }
+      .box{ padding:14px; }
+      .grid{ grid-template-columns: 1fr; }
+      .controls{ gap:8px; }
+      label{ width:100%; justify-content:space-between; }
+      input{ width:140px; }
+      /* botones full width en móvil */
+      .controls button{ width:100%; }
+    }
+
+    /* PDF */
+    @media print{
+      html[data-theme="dark"]{
+        --bg:white; --card:white; --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
+        --tableHead:#f8fafc; --rowA:#ffffff; --rowB:#f8fafc; --hover:#eef2ff;
+      }
+      body{ padding:0; }
+      button,.controls{ display:none!important; }
+      .box{ box-shadow:none; border:none; }
+      input{ border:none; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="box">
+
+  <div class="topbar">
+    <div>
+      <h2>Simulador de Notas ULima (para no repetir el ciclo)</h2>
+      <div class="subtitle">
+        Aprobación 10.5 · Notas 1–20 · El promedio no perdona
+      </div>
+      <div class="creator">
+        Creador: <b>Sebastián Mory Ricse</b>
+      </div>
+    </div>
+    <button id="btnTheme" class="btn-ghost" onclick="toggleTheme()">🌙 Dark mode</button>
+  </div>
+
+  <div class="hint">
+    Ingresa tus notas conocidas. Si aún no tienes nota, deja el campo vacío pero indica el porcentaje.
+  </div>
+
+  <div class="controls">
+    <button onclick="agregarFila()">Agregar fila</button>
+    <button onclick="calcular()">Calcular promedio</button>
+
+    <label>Hasta:
+      <input id="hastaProm" type="number" min="10.5" max="20" step="0.5" value="20">
+    </label>
+    <label>Paso:
+      <input id="pasoProm" type="number" min="0.5" max="2" step="0.5" value="0.5">
+    </label>
+
+    <button class="btn-primary" onclick="correrSimulacion()">Correr simulación</button>
+    <button onclick="window.print()">Guardar PDF</button>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nota</th>
+              <th>%</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tabla"></tbody>
+        </table>
+      </div>
+
+      <h3>Promedio: <span id="resultado">—</span></h3>
+      <h3 id="estado"></h3>
+      <div class="small" id="mensajeExtra"></div>
+    </div>
+
+    <div>
+      <div class="tableWrap">
+        <table>
+          <thead id="escHead"></thead>
+          <tbody id="escenarios"></tbody>
+        </table>
+      </div>
+      <div class="small" style="margin-top:10px;">
+        Tip: en celular puedes deslizar la tabla de simulación hacia los lados.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const APROBACION = 10.5;
+  const tabla = document.getElementById("tabla");
+
+  function applyTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    const btn = document.getElementById("btnTheme");
+    btn.textContent = (theme === "dark") ? "☀️ Modo claro" : "🌙 Dark mode";
+  }
+
+  function toggleTheme(){
+    const cur = document.documentElement.getAttribute("data-theme") || "light";
+    applyTheme(cur==="dark" ? "light" : "dark");
+  }
+
+  (function initTheme(){
+    const saved = localStorage.getItem("theme");
+    applyTheme(saved || "light");
+  })();
+
+  function agregarFila(nota="", porcentaje=""){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="number" min="1" max="20" step="1" value="${nota}" placeholder="Ej: 14"></td>
+      <td><input type="number" min="0" max="100" step="0.01" value="${porcentaje}" placeholder="Ej: 20"></td>
+      <td><button onclick="this.closest('tr').remove(); calcular();">✖</button></td>`;
+    tabla.appendChild(tr);
+  }
+
+  // filas iniciales
+  agregarFila(); agregarFila(); agregarFila();
+
+  function leer(){
+    return [...tabla.querySelectorAll("tr")].map(r=>{
+      const i=r.querySelectorAll("input");
+      const notaStr = i[0].value.trim();
+      const porcStr = i[1].value.trim();
+      return {
+        nota: notaStr==="" ? null : Number(notaStr),
+        p: porcStr==="" ? 0 : Number(porcStr)
+      };
+    }).filter(x => x.nota !== null || x.p !== 0);
+  }
+
+  function calcular(){
+    const it = leer();
+    let suma = 0, total = 0, sumaConocidas = 0;
+
+    it.forEach(x=>{
+      total += x.p;
+      if(x.nota !== null){
+        suma += x.nota * x.p / 100;
+        sumaConocidas += x.p;
+      }
+    });
+
+    document.getElementById("resultado").textContent = suma.toFixed(2);
+    document.getElementById("estado").innerHTML =
+      suma >= APROBACION ? '<span class="ok">APROBADO ✅</span>' : '<span class="bad">NO APROBADO ❌</span>';
+
+    const msg = document.getElementById("mensajeExtra");
+    if(total < 100){
+      msg.textContent = `Te falta completar ${(100-total).toFixed(2)}% de porcentajes.`;
+      msg.className = "small";
+    } else if(total > 100.0001){
+      msg.textContent = `Ojo: tus porcentajes suman ${total.toFixed(2)}% (debería ser 100%).`;
+      msg.className = "small bad";
+    } else {
+      msg.textContent = "";
+      msg.className = "small";
+    }
+  }
+
+  function correrSimulacion(){
+    const it = leer();
+    const total = it.reduce((a,x)=>a+x.p,0);
+    if(total > 100.0001){
+      alert("Tus porcentajes suman más de 100%. Corrige eso.");
+      return;
+    }
+
+    const pend = it.filter(x=>x.nota==null && x.p>0);
+    if(pend.length===0){
+      alert("No hay evaluaciones pendientes (nota vacía con %).");
+      return;
+    }
+
+    let head = '<tr><th>Obj</th><th>Prom</th><th>Estado</th>';
+    pend.forEach(p=> head += `<th><span class="pill">${p.p.toFixed(2)}%</span></th>`);
+    head += '</tr>';
+    document.getElementById("escHead").innerHTML = head;
+
+    const tbody = document.getElementById("escenarios");
+    tbody.innerHTML = "";
+
+    const hasta = Number(document.getElementById("hastaProm").value);
+    const paso  = Number(document.getElementById("pasoProm").value);
+
+    for(let target = APROBACION; target <= hasta + 1e-9; target += paso){
+      const notas = pend.map(()=> Math.floor(Math.random()*20)+1);
+
+      let s=0, idx=0;
+      it.forEach(x=>{
+        if(x.nota!=null) s += x.nota * x.p / 100;
+        else s += notas[idx++] * x.p / 100;
+      });
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${target.toFixed(1)}</td>
+          <td>${s.toFixed(2)}</td>
+          <td>${s>=APROBACION ? '✅' : '❌'}</td>
+          ${notas.map(n=>`<td>${n}</td>`).join("")}
+        </tr>`;
+    }
+
+    calcular();
+  }
+
+  calcular();
+</script>
+</body>
+</html>
