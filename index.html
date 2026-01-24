@@ -167,6 +167,39 @@
       align-items:start;
     }
 
+    .sim-grid{
+      display:grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap:14px;
+      margin-top:14px;
+      align-items:start;
+    }
+
+    .summary-card{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow2);
+    }
+
+    .summary-card h3{
+      margin:0 0 10px;
+      font-size:16px;
+    }
+
+    .mini-table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+
+    .mini-table th,
+    .mini-table td{
+      text-align:left;
+      padding:6px 8px;
+      border-bottom:1px dashed var(--border);
+    }
+
     .tableWrap{
       overflow:auto;
       border-radius:16px;
@@ -221,7 +254,8 @@
     @media (max-width: 900px){
       body{ padding:14px; }
       .box{ padding:14px; }
-      .grid{ grid-template-columns: 1fr; }
+      .grid,
+      .sim-grid{ grid-template-columns: 1fr; }
       .controls{ gap:8px; }
       label{ width:100%; justify-content:space-between; }
       input{ width:140px; }
@@ -259,57 +293,84 @@
     <button id="btnTheme" class="btn-ghost" onclick="toggleTheme()">🌙 Dark mode</button>
   </div>
 
-  <div class="hint">
-    Ingresa tus notas conocidas. Si aún no tienes nota, deja el campo vacío pero indica el porcentaje.
-  </div>
+  <section id="vistaEntrada">
+    <div class="hint">
+      Ingresa tus notas conocidas. Si aún no tienes nota, deja el campo vacío pero indica el porcentaje.
+    </div>
 
-  <div class="controls">
-    <button onclick="agregarFila()">Agregar fila</button>
-    <button onclick="calcular()">Calcular promedio</button>
+    <div class="controls">
+      <button onclick="agregarFila()">Agregar fila</button>
+      <button onclick="calcular()">Calcular promedio</button>
 
-    <label>Hasta:
-      <input id="hastaProm" type="number" min="10.5" max="20" step="0.5" value="20">
-    </label>
-    <label>Paso:
-      <input id="pasoProm" type="number" min="0.5" max="2" step="0.5" value="0.5">
-    </label>
+      <label>Hasta:
+        <input id="hastaProm" type="number" min="10.5" max="20" step="0.5" value="20">
+      </label>
+      <label>Paso:
+        <input id="pasoProm" type="number" min="0.5" max="2" step="0.5" value="0.5">
+      </label>
 
-    <button class="btn-primary" onclick="correrSimulacion()">Correr simulación</button>
-    <button onclick="window.print()">Guardar PDF</button>
-  </div>
+      <button class="btn-primary" onclick="correrSimulacion()">Correr simulación</button>
+      <button onclick="window.print()">Guardar PDF</button>
+    </div>
 
-  <div class="grid">
-    <div>
-      <div class="tableWrap">
-        <table>
+    <div class="grid">
+      <div>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nota</th>
+                <th>%</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tabla"></tbody>
+          </table>
+        </div>
+
+        <h3>Promedio: <span id="resultado">—</span></h3>
+        <h3 id="estado"></h3>
+        <div class="small" id="mensajeExtra"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="vistaSimulacion" style="display:none;">
+    <div class="controls">
+      <button onclick="volverEdicion()">← Volver a editar</button>
+      <button class="btn-primary" onclick="correrSimulacion()">Actualizar simulación</button>
+      <button onclick="window.print()">Guardar PDF</button>
+    </div>
+
+    <div class="sim-grid">
+      <div class="summary-card">
+        <h3>Miniatura de tus datos</h3>
+        <table class="mini-table">
           <thead>
             <tr>
+              <th>#</th>
               <th>Nota</th>
               <th>%</th>
-              <th></th>
             </tr>
           </thead>
-          <tbody id="tabla"></tbody>
+          <tbody id="miniaturaDatos"></tbody>
         </table>
+        <div class="small" id="miniaturaMensaje"></div>
       </div>
 
-      <h3>Promedio: <span id="resultado">—</span></h3>
-      <h3 id="estado"></h3>
-      <div class="small" id="mensajeExtra"></div>
-    </div>
-
-    <div>
-      <div class="tableWrap">
-        <table>
-          <thead id="escHead"></thead>
-          <tbody id="escenarios"></tbody>
-        </table>
-      </div>
-      <div class="small" style="margin-top:10px;">
-        Tip: en celular puedes deslizar la tabla de simulación hacia los lados.
+      <div>
+        <div class="tableWrap">
+          <table>
+            <thead id="escHead"></thead>
+            <tbody id="escenarios"></tbody>
+          </table>
+        </div>
+        <div class="small" style="margin-top:10px;">
+          Tip: en celular puedes deslizar la tabla de simulación hacia los lados.
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
 </div>
 
@@ -469,6 +530,52 @@
     }
 
     calcular();
+    renderMiniatura(it, total);
+    mostrarVista("simulacion");
+  }
+
+  function renderMiniatura(items, total){
+    const tbody = document.getElementById("miniaturaDatos");
+    tbody.innerHTML = "";
+
+    items.forEach((item, idx) => {
+      const notaTexto = item.nota === null ? "—" : item.nota.toFixed(0);
+      const porcTexto = item.p ? `${item.p.toFixed(2)}%` : "—";
+      tbody.innerHTML += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${notaTexto}</td>
+          <td>${porcTexto}</td>
+        </tr>`;
+    });
+
+    const msg = document.getElementById("miniaturaMensaje");
+    if(total < 100){
+      msg.textContent = `Te falta completar ${(100-total).toFixed(2)}% de porcentajes.`;
+      msg.className = "small";
+    } else if(total > 100.0001){
+      msg.textContent = `Ojo: tus porcentajes suman ${total.toFixed(2)}% (debería ser 100%).`;
+      msg.className = "small bad";
+    } else {
+      msg.textContent = "Porcentajes completos (100%).";
+      msg.className = "small ok";
+    }
+  }
+
+  function mostrarVista(vista){
+    const entrada = document.getElementById("vistaEntrada");
+    const simulacion = document.getElementById("vistaSimulacion");
+    if(vista === "simulacion"){
+      entrada.style.display = "none";
+      simulacion.style.display = "block";
+    } else {
+      entrada.style.display = "block";
+      simulacion.style.display = "none";
+    }
+  }
+
+  function volverEdicion(){
+    mostrarVista("entrada");
   }
 
   calcular();
