@@ -74,6 +74,82 @@
       box-shadow:var(--shadow);
     }
 
+    .inicio{
+      position:relative;
+      min-height: calc(100vh - 48px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: radial-gradient(circle at top, rgba(255,255,255,.7), rgba(243,245,251,.92)),
+        linear-gradient(135deg, rgba(255,255,255,.9), rgba(237,242,250,.95));
+      border-radius:24px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
+
+    html[data-theme="dark"] .inicio{
+      background: radial-gradient(circle at top, rgba(30,41,59,.6), rgba(11,16,32,.95)),
+        linear-gradient(135deg, rgba(15,23,42,.95), rgba(2,6,23,.92));
+    }
+
+    #mathCanvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      opacity:.8;
+    }
+
+    .inicio-content{
+      position:relative;
+      text-align:center;
+      padding:32px 36px;
+      border-radius:24px;
+      backdrop-filter: blur(18px);
+      background: rgba(255,255,255,.7);
+      border:1px solid rgba(226,232,240,.8);
+      box-shadow: 0 20px 50px rgba(15,23,42,.12);
+      max-width:520px;
+    }
+
+    html[data-theme="dark"] .inicio-content{
+      background: rgba(15,23,42,.75);
+      border-color: rgba(51,65,85,.75);
+      box-shadow: 0 20px 50px rgba(0,0,0,.45);
+    }
+
+    .inicio-title{
+      font-size:28px;
+      margin:0;
+      letter-spacing:.5px;
+    }
+
+    .inicio-subtitle{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .btn-start{
+      margin-top:18px;
+      padding:12px 24px;
+      border-radius:999px;
+      border:1px solid transparent;
+      background: linear-gradient(135deg, #0f172a, #334155);
+      color:white;
+      font-weight:800;
+      letter-spacing:.3px;
+      box-shadow: 0 16px 30px rgba(15,23,42,.25);
+    }
+
+    html[data-theme="dark"] .btn-start{
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      box-shadow: 0 16px 30px rgba(59,130,246,.25);
+    }
+
     .topbar{
       display:flex;
       justify-content:space-between;
@@ -256,6 +332,8 @@
       .box{ padding:14px; }
       .grid,
       .sim-grid{ grid-template-columns: 1fr; }
+      .inicio{ min-height: calc(100vh - 28px); }
+      .inicio-content{ padding:24px; }
       .controls{ gap:8px; }
       label{ width:100%; justify-content:space-between; }
       input{ width:140px; }
@@ -278,6 +356,7 @@
 </head>
 
 <body>
+<body>
 <div class="box">
 
   <div class="topbar">
@@ -290,6 +369,24 @@
         Creador: <b>Sebastián Mory Ricse</b>
       </div>
     </div>
+    <button id="btnTheme" class="btn-ghost" onclick="toggleTheme()">🌙 Dark mode</button>
+  </div>
+
+  <section id="vistaInicio">
+    <div class="inicio">
+      <canvas id="mathCanvas" aria-hidden="true"></canvas>
+      <div class="inicio-content">
+        <h1 class="inicio-title">Simulador de Notas ULima</h1>
+        <p class="inicio-subtitle">
+          Proyecta escenarios de notas con un estilo claro y directo. Tus porcentajes,
+          tus promedios y la simulación en un solo paso.
+        </p>
+        <button class="btn-start" onclick="iniciarSimulador()">Iniciar simulador</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="vistaEntrada" style="display:none;">
     <button id="btnTheme" class="btn-ghost" onclick="toggleTheme()">🌙 Dark mode</button>
   </div>
 
@@ -377,6 +474,12 @@
 <script>
   const APROBACION = 10.5;
   const tabla = document.getElementById("tabla");
+  const canvas = document.getElementById("mathCanvas");
+  const ctx = canvas.getContext("2d");
+  const symbols = ["∑","π","√","Δ","∫","∞","+","−","×","÷","=","x","y","z","sin","cos","tan","log","∂","≈","≠","≤","≥","λ","μ","σ","φ","β","θ","∇","1","2","3","4","5","6","7","8","9","0"];
+  const particles = [];
+  const maxParticles = 90;
+  const mouse = { x: -9999, y: -9999, active: false };
 
   function applyTheme(theme){
     document.documentElement.setAttribute("data-theme", theme);
@@ -394,6 +497,88 @@
     const saved = localStorage.getItem("theme");
     applyTheme(saved || "light");
   })();
+
+  function resizeCanvas(){
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  }
+
+  function createParticle(){
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: Math.random() * rect.width,
+      y: Math.random() * -rect.height,
+      speed: 0.3 + Math.random() * 1.4,
+      size: 10 + Math.random() * 14,
+      symbol: symbols[Math.floor(Math.random() * symbols.length)],
+      opacity: 0.15 + Math.random() * 0.6
+    };
+  }
+
+  function updateParticles(){
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.font = "14px system-ui, sans-serif";
+
+    particles.forEach(p => {
+      p.y += p.speed;
+      const dx = p.x - mouse.x;
+      const dy = p.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if(mouse.active && dist < 120){
+        p.x += dx * 0.008;
+        p.y += dy * 0.008;
+      }
+      if(p.y > rect.height + 20){
+        p.y = -20;
+        p.x = Math.random() * rect.width;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.font = `${p.size}px system-ui, sans-serif`;
+      ctx.fillStyle = document.documentElement.getAttribute("data-theme") === "dark"
+        ? "rgba(148,163,184,0.7)"
+        : "rgba(15,23,42,0.5)";
+      ctx.fillText(p.symbol, p.x, p.y);
+      ctx.restore();
+    });
+
+    requestAnimationFrame(updateParticles);
+  }
+
+  function initParticles(){
+    particles.length = 0;
+    for(let i = 0; i < maxParticles; i++){
+      particles.push(createParticle());
+    }
+  }
+
+  function setupCanvas(){
+    resizeCanvas();
+    initParticles();
+  }
+
+  window.addEventListener("resize", () => {
+    resizeCanvas();
+    initParticles();
+  });
+
+  window.addEventListener("mousemove", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = event.clientX - rect.left;
+    mouse.y = event.clientY - rect.top;
+    mouse.active = true;
+  });
+
+  window.addEventListener("mouseleave", () => {
+    mouse.active = false;
+  });
 
   function agregarFila(nota="", porcentaje=""){
     const tr = document.createElement("tr");
@@ -578,6 +763,64 @@
     mostrarVista("entrada");
   }
 
+  function renderMiniatura(items, total){
+    const tbody = document.getElementById("miniaturaDatos");
+    tbody.innerHTML = "";
+
+    items.forEach((item, idx) => {
+      const notaTexto = item.nota === null ? "—" : item.nota.toFixed(0);
+      const porcTexto = item.p ? `${item.p.toFixed(2)}%` : "—";
+      tbody.innerHTML += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${notaTexto}</td>
+          <td>${porcTexto}</td>
+        </tr>`;
+    });
+
+    const msg = document.getElementById("miniaturaMensaje");
+    if(total < 100){
+      msg.textContent = `Te falta completar ${(100-total).toFixed(2)}% de porcentajes.`;
+      msg.className = "small";
+    } else if(total > 100.0001){
+      msg.textContent = `Ojo: tus porcentajes suman ${total.toFixed(2)}% (debería ser 100%).`;
+      msg.className = "small bad";
+    } else {
+      msg.textContent = "Porcentajes completos (100%).";
+      msg.className = "small ok";
+    }
+  }
+
+  function mostrarVista(vista){
+    const inicio = document.getElementById("vistaInicio");
+    const entrada = document.getElementById("vistaEntrada");
+    const simulacion = document.getElementById("vistaSimulacion");
+    if(vista === "simulacion"){
+      inicio.style.display = "none";
+      entrada.style.display = "none";
+      simulacion.style.display = "block";
+    } else if(vista === "entrada"){
+      inicio.style.display = "none";
+      entrada.style.display = "block";
+      simulacion.style.display = "none";
+    } else {
+      inicio.style.display = "block";
+      entrada.style.display = "none";
+      simulacion.style.display = "none";
+    }
+  }
+
+  function volverEdicion(){
+    mostrarVista("entrada");
+  }
+
+  function iniciarSimulador(){
+    mostrarVista("entrada");
+  }
+
+  setupCanvas();
+  updateParticles();
+  mostrarVista("inicio");
   calcular();
 </script>
 </body>
