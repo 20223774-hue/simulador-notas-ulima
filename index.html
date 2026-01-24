@@ -467,6 +467,10 @@
           ${pend.map((_, idx)=>`<td>${esPosible ? notas[idx].toFixed(0) : '—'}</td>`).join("")}
         </tr>`;
     }
+          <td>${esPosible ? (promFinal>=APROBACION ? '✅' : '❌') : '❌'}</td>
+          ${pend.map((_, idx)=>`<td>${esPosible ? notas[idx].toFixed(1) : '—'}</td>`).join("")}
+        </tr>`;
+    }
 
     calcular();
   }
