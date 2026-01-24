@@ -416,6 +416,47 @@
     const sumaConocidas = conocidas.reduce((a,x)=>a + x.nota * x.p / 100, 0);
     const porcPend = pend.reduce((a,x)=>a + x.p, 0);
 
+    function generarNotas(pendientes, promedioReq){
+      if(pendientes.length === 1){
+        return [promedioReq];
+      }
+
+      const totalPeso = pendientes.reduce((a,x)=>a+x.p,0);
+      const objetivo = promedioReq * totalPeso;
+      const notas = [];
+      let suma = 0;
+      let pesoRestante = totalPeso;
+
+      for(let i = 0; i < pendientes.length; i++){
+        const p = pendientes[i].p;
+        pesoRestante -= p;
+        const minRem = 1 * pesoRestante;
+        const maxRem = 20 * pesoRestante;
+        const minNota = Math.max(1, (objetivo - suma - maxRem) / p);
+        const maxNota = Math.min(20, (objetivo - suma - minRem) / p);
+        if(minNota > maxNota || Number.isNaN(minNota) || Number.isNaN(maxNota)){
+          return pendientes.map(()=> promedioReq);
+        }
+
+        const nota = i === pendientes.length - 1
+          ? (objetivo - suma) / p
+          : (Math.random() * (maxNota - minNota)) + minNota;
+        const notaFinal = Math.min(20, Math.max(1, nota));
+        notas.push(notaFinal);
+        suma += notaFinal * p;
+      }
+
+      return notas;
+    }
+
+    for(let target = APROBACION; target <= hasta + 1e-9; target += paso){
+      const requerido = (target - sumaConocidas) / (porcPend / 100);
+      const esPosible = Number.isFinite(requerido) && requerido >= 1 && requerido <= 20;
+      const notas = esPosible ? generarNotas(pend, requerido) : [];
+      const sumaPend = esPosible
+        ? notas.reduce((acc, n, idx)=> acc + (n * pend[idx].p / 100), 0)
+        : 0;
+      const promFinal = esPosible ? (sumaConocidas + sumaPend) : null;
     for(let target = APROBACION; target <= hasta + 1e-9; target += paso){
       const requerido = (target - sumaConocidas) / (porcPend / 100);
       const esPosible = Number.isFinite(requerido) && requerido >= 1 && requerido <= 20;
