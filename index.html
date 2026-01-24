@@ -457,6 +457,11 @@
         ? notas.reduce((acc, n, idx)=> acc + (n * pend[idx].p / 100), 0)
         : 0;
       const promFinal = esPosible ? (sumaConocidas + sumaPend) : null;
+    for(let target = APROBACION; target <= hasta + 1e-9; target += paso){
+      const requerido = (target - sumaConocidas) / (porcPend / 100);
+      const esPosible = Number.isFinite(requerido) && requerido >= 1 && requerido <= 20;
+      const notas = esPosible ? pend.map(()=> requerido) : [];
+      const promFinal = esPosible ? (sumaConocidas + (requerido * porcPend / 100)) : null;
 
       tbody.innerHTML += `
         <tr>
