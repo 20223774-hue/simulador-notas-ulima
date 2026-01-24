@@ -412,21 +412,22 @@
     const hasta = Number(document.getElementById("hastaProm").value);
     const paso  = Number(document.getElementById("pasoProm").value);
 
-    for(let target = APROBACION; target <= hasta + 1e-9; target += paso){
-      const notas = pend.map(()=> Math.floor(Math.random()*20)+1);
+    const conocidas = it.filter(x=>x.nota!=null);
+    const sumaConocidas = conocidas.reduce((a,x)=>a + x.nota * x.p / 100, 0);
+    const porcPend = pend.reduce((a,x)=>a + x.p, 0);
 
-      let s=0, idx=0;
-      it.forEach(x=>{
-        if(x.nota!=null) s += x.nota * x.p / 100;
-        else s += notas[idx++] * x.p / 100;
-      });
+    for(let target = APROBACION; target <= hasta + 1e-9; target += paso){
+      const requerido = (target - sumaConocidas) / (porcPend / 100);
+      const esPosible = Number.isFinite(requerido) && requerido >= 1 && requerido <= 20;
+      const notas = esPosible ? pend.map(()=> requerido) : [];
+      const promFinal = esPosible ? (sumaConocidas + (requerido * porcPend / 100)) : null;
 
       tbody.innerHTML += `
         <tr>
           <td>${target.toFixed(1)}</td>
-          <td>${s.toFixed(2)}</td>
-          <td>${s>=APROBACION ? '✅' : '❌'}</td>
-          ${notas.map(n=>`<td>${n}</td>`).join("")}
+          <td>${esPosible ? promFinal.toFixed(2) : '—'}</td>
+          <td>${esPosible ? (promFinal>=APROBACION ? '✅' : '❌') : '❌'}</td>
+          ${pend.map((_, idx)=>`<td>${esPosible ? notas[idx].toFixed(1) : '—'}</td>`).join("")}
         </tr>`;
     }
 
