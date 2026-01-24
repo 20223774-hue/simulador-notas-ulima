@@ -417,8 +417,9 @@
     const porcPend = pend.reduce((a,x)=>a + x.p, 0);
 
     function generarNotas(pendientes, promedioReq){
+      const redondearNota = (nota) => Math.min(20, Math.max(1, Math.round(nota)));
       if(pendientes.length === 1){
-        return [promedioReq];
+        return [redondearNota(promedioReq)];
       }
 
       const totalPeso = pendientes.reduce((a,x)=>a+x.p,0);
@@ -441,7 +442,7 @@
         const nota = i === pendientes.length - 1
           ? (objetivo - suma) / p
           : (Math.random() * (maxNota - minNota)) + minNota;
-        const notaFinal = Math.min(20, Math.max(1, nota));
+        const notaFinal = redondearNota(nota);
         notas.push(notaFinal);
         suma += notaFinal * p;
       }
@@ -462,6 +463,10 @@
         <tr>
           <td>${target.toFixed(1)}</td>
           <td>${esPosible ? promFinal.toFixed(2) : '—'}</td>
+          <td>${esPosible ? (promFinal>=APROBACION ? '✅' : '❌') : '❌'}</td>
+          ${pend.map((_, idx)=>`<td>${esPosible ? notas[idx].toFixed(0) : '—'}</td>`).join("")}
+        </tr>`;
+    }
           <td>${esPosible ? (promFinal>=APROBACION ? '✅' : '❌') : '❌'}</td>
           ${pend.map((_, idx)=>`<td>${esPosible ? notas[idx].toFixed(1) : '—'}</td>`).join("")}
         </tr>`;
