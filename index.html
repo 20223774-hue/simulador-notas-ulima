@@ -356,6 +356,7 @@
 </head>
 
 <body>
+<body>
 <div class="box">
 
   <div class="topbar">
@@ -386,6 +387,10 @@
   </section>
 
   <section id="vistaEntrada" style="display:none;">
+    <button id="btnTheme" class="btn-ghost" onclick="toggleTheme()">🌙 Dark mode</button>
+  </div>
+
+  <section id="vistaEntrada">
     <div class="hint">
       Ingresa tus notas conocidas. Si aún no tienes nota, deja el campo vacío pero indica el porcentaje.
     </div>
@@ -712,6 +717,50 @@
     calcular();
     renderMiniatura(it, total);
     mostrarVista("simulacion");
+  }
+
+  function renderMiniatura(items, total){
+    const tbody = document.getElementById("miniaturaDatos");
+    tbody.innerHTML = "";
+
+    items.forEach((item, idx) => {
+      const notaTexto = item.nota === null ? "—" : item.nota.toFixed(0);
+      const porcTexto = item.p ? `${item.p.toFixed(2)}%` : "—";
+      tbody.innerHTML += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${notaTexto}</td>
+          <td>${porcTexto}</td>
+        </tr>`;
+    });
+
+    const msg = document.getElementById("miniaturaMensaje");
+    if(total < 100){
+      msg.textContent = `Te falta completar ${(100-total).toFixed(2)}% de porcentajes.`;
+      msg.className = "small";
+    } else if(total > 100.0001){
+      msg.textContent = `Ojo: tus porcentajes suman ${total.toFixed(2)}% (debería ser 100%).`;
+      msg.className = "small bad";
+    } else {
+      msg.textContent = "Porcentajes completos (100%).";
+      msg.className = "small ok";
+    }
+  }
+
+  function mostrarVista(vista){
+    const entrada = document.getElementById("vistaEntrada");
+    const simulacion = document.getElementById("vistaSimulacion");
+    if(vista === "simulacion"){
+      entrada.style.display = "none";
+      simulacion.style.display = "block";
+    } else {
+      entrada.style.display = "block";
+      simulacion.style.display = "none";
+    }
+  }
+
+  function volverEdicion(){
+    mostrarVista("entrada");
   }
 
   function renderMiniatura(items, total){
