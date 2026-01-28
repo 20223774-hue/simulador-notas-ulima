@@ -187,6 +187,13 @@
       flex-wrap:wrap;
     }
 
+    .topbar-actions{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-end;
+    }
+
     h2{ margin:0; font-size:22px; }
     .subtitle{ font-size:13px; color:var(--muted); margin-top:6px; line-height:1.35; }
     .creator{ font-size:12px; color:var(--muted); margin-top:4px; }
@@ -368,6 +375,8 @@
       input{ width:140px; }
       /* botones full width en móvil */
       .controls button{ width:100%; }
+      .topbar-actions{ width:100%; align-items:stretch; }
+      .topbar-actions button{ width:100%; }
     }
 
     /* PDF */
@@ -406,7 +415,7 @@
         <div class="subtitle">Aprobación 10.5 · Notas 1–20 · El promedio no perdona</div>
         <div class="creator">Creador: Sebastián Mory Ricse</div>
       </div>
-      <button id="btnTheme" class="btn-ghost" onclick="toggleTheme()">🌙 Dark mode</button>
+      <button class="btn-ghost btn-theme" onclick="toggleTheme()">🌙 Dark mode</button>
     </div>
 
     <div class="hint">
@@ -458,10 +467,13 @@
         <div class="subtitle">Aprobación 10.5 · Notas 1–20 · El promedio no perdona</div>
         <div class="creator">Creador: Sebastián Mory Ricse</div>
       </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost btn-theme" onclick="toggleTheme()">🌙 Dark mode</button>
+        <button class="btn-secondary" onclick="volverInicio()">Inicia</button>
+      </div>
     </div>
 
     <div class="controls">
-      <button onclick="volverInicio()">Inicia</button>
       <button onclick="volverEdicion()">← Volver a editar</button>
       <button class="btn-primary" onclick="correrSimulacion()">Actualizar simulación</button>
       <button onclick="window.print()">Guardar PDF</button>
@@ -512,8 +524,9 @@
   function applyTheme(theme){
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
-    const btn = document.getElementById("btnTheme");
-    btn.textContent = (theme === "dark") ? "☀️ Modo claro" : "🌙 Dark mode";
+    document.querySelectorAll(".btn-theme").forEach((btn) => {
+      btn.textContent = (theme === "dark") ? "☀️ Modo claro" : "🌙 Dark mode";
+    });
   }
 
   function toggleTheme(){
