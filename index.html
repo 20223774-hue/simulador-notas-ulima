@@ -849,8 +849,11 @@
     </div>
 
     <div class="controls">
-      <label>Créditos aprobados (auto)
+      <label>Créditos aprobados (auto) (obligatorios)
         <input id="creditosAprobados" type="number" min="0" max="250" step="1" value="0" readonly>
+      </label>
+      <label>Créditos aprobados (auto) (electivos)
+        <input id="creditosElectivos" type="number" min="0" max="250" step="1" value="0" readonly>
       </label>
       <label>Nivel de ciclo (auto)
         <input id="nivelCulminado" type="number" min="0" max="10" step="1" value="1" readonly>
@@ -1483,12 +1486,31 @@
   }
 
   function calcularCreditosDesde(aprobados, actualizarInput = true){
-    const total = [...aprobados].reduce((acc, id) => acc + (cursosPorId[id]?.creditos || 0), 0);
+    const resumen = [...aprobados].reduce((acc, id) => {
+      const curso = cursosPorId[id];
+      if(!curso){
+        return acc;
+      }
+      if(curso.tipo === "electivo"){
+        acc.electivos += curso.creditos || 0;
+      } else {
+        acc.obligatorios += curso.creditos || 0;
+      }
+      acc.total += curso.creditos || 0;
+      return acc;
+    }, { total: 0, obligatorios: 0, electivos: 0 });
+
     if(actualizarInput){
       const inputCreditos = document.getElementById("creditosAprobados");
-      inputCreditos.value = total;
+      const inputElectivos = document.getElementById("creditosElectivos");
+      if(inputCreditos){
+        inputCreditos.value = resumen.obligatorios;
+      }
+      if(inputElectivos){
+        inputElectivos.value = resumen.electivos;
+      }
     }
-    return total;
+    return resumen.total;
   }
 
   function calcularNivelCiclo(aprobados){
@@ -1556,6 +1578,7 @@
       check.checked = false;
     });
     document.getElementById("creditosAprobados").value = 0;
+    document.getElementById("creditosElectivos").value = 0;
     document.getElementById("nivelCulminado").value = 1;
     renderResultados("resultadoObligatorios", "emptyObligatorios", []);
     renderResultados("resultadoElectivos", "emptyElectivos", []);
