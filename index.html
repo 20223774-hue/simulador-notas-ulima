@@ -505,6 +505,151 @@
       font-size:13px;
     }
 
+    .course-action-group{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .action-tile{
+      padding:12px 16px;
+      border-radius:14px;
+      border:1px solid var(--primary);
+      background:var(--primary);
+      color:white;
+      font-weight:800;
+      box-shadow:0 12px 20px rgba(37,99,235,.25);
+    }
+
+    .action-tile:hover{
+      background:var(--primary2);
+      border-color:var(--primary2);
+    }
+
+    .schedule-grid{
+      display:grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap:14px;
+      margin-top:14px;
+      align-items:start;
+    }
+
+    .schedule-section{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow2);
+      background:var(--card);
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .schedule-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:120px;
+    }
+
+    .schedule-item{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+      background:var(--rowA);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      cursor:grab;
+    }
+
+    .schedule-item:active{
+      cursor:grabbing;
+    }
+
+    .schedule-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .badge-grid{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .badge-card{
+      border:1px dashed var(--border);
+      border-radius:14px;
+      padding:12px;
+      background:var(--rowA);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .badge-header{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:space-between;
+    }
+
+    .badge-title{
+      flex:1;
+      min-width:160px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      font-weight:700;
+      background:transparent;
+      color:var(--text);
+    }
+
+    .badge-dropzone{
+      border:1px dashed var(--border);
+      border-radius:12px;
+      padding:10px;
+      min-height:70px;
+      background:var(--tableHead);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .badge-dropzone.drag-over{
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px var(--focus);
+    }
+
+    .badge-course{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:var(--rowA);
+      cursor:grab;
+    }
+
+    .badge-course button{
+      border:none;
+      background:transparent;
+      font-weight:800;
+      color:var(--bad);
+      cursor:pointer;
+    }
+
+    .badge-empty{
+      font-size:12px;
+      color:var(--muted);
+    }
+
     /* ✅ Responsive para celular */
     @media (max-width: 900px){
       body{ padding:14px; }
@@ -521,6 +666,9 @@
       .controls button{ width:100%; }
       .topbar-actions{ width:100%; align-items:stretch; }
       .topbar-actions button{ width:100%; }
+      .course-action-group{ width:100%; }
+      .course-action-group button{ width:100%; }
+      .schedule-grid{ grid-template-columns: 1fr; }
     }
 
     /* PDF */
@@ -679,7 +827,10 @@
       <label>Nivel de ciclo (auto)
         <input id="nivelCulminado" type="number" min="0" max="10" step="1" value="1" readonly>
       </label>
-      <button class="btn-primary" onclick="simularCursos()">Simular cursos disponibles</button>
+      <div class="course-action-group">
+        <button class="action-tile" onclick="simularCursos()">Simular cursos disponibles</button>
+        <button class="action-tile" onclick="abrirHorario()">Armar horario</button>
+      </div>
       <button onclick="limpiarCursos()">Limpiar selección</button>
     </div>
 
@@ -703,6 +854,41 @@
             Aún no hay cursos electivos disponibles con los requisitos actuales.
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="vistaHorario" style="display:none;">
+    <div class="topbar">
+      <div>
+        <h2>Armar horario</h2>
+        <div class="subtitle">Arrastra los cursos disponibles a tus gafetes por ciclo y edita el nombre de cada uno.</div>
+        <div class="creator">Creador: Sebastián Mory Ricse</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost btn-theme" onclick="toggleTheme()">🌙 Dark mode</button>
+        <button class="btn-secondary" onclick="volverCursos()">Volver a simulador</button>
+      </div>
+    </div>
+
+    <div class="hint">
+      Al mover cursos a un gafete, se consideran cursados y desbloquean nuevos cursos disponibles.
+    </div>
+
+    <div class="schedule-grid">
+      <div class="schedule-section">
+        <h3>📚 Cursos disponibles</h3>
+        <div class="schedule-list" id="scheduleCourseList"></div>
+        <div class="course-empty" id="scheduleEmpty" style="display:none;">
+          No hay cursos disponibles con los requisitos actuales.
+        </div>
+      </div>
+      <div class="schedule-section">
+        <div class="schedule-header">
+          <h3>🗂️ Gafetes por ciclo</h3>
+          <button class="btn-primary" onclick="agregarGafete()">+ Agregar gafete</button>
+        </div>
+        <div class="badge-grid" id="scheduleBadges"></div>
       </div>
     </div>
   </section>
@@ -986,32 +1172,46 @@
     }
   }
 
+  let vistaActual = "inicio";
+
   function mostrarVista(vista){
     const inicio = document.getElementById("vistaInicio");
     const entrada = document.getElementById("vistaEntrada");
     const simulacion = document.getElementById("vistaSimulacion");
     const cursos = document.getElementById("vistaCursos");
+    const horario = document.getElementById("vistaHorario");
     if(vista === "simulacion"){
       inicio.style.display = "none";
       entrada.style.display = "none";
       simulacion.style.display = "block";
       cursos.style.display = "none";
+      horario.style.display = "none";
     } else if(vista === "entrada"){
       inicio.style.display = "none";
       entrada.style.display = "block";
       simulacion.style.display = "none";
       cursos.style.display = "none";
+      horario.style.display = "none";
     } else if(vista === "cursos"){
       inicio.style.display = "none";
       entrada.style.display = "none";
       simulacion.style.display = "none";
       cursos.style.display = "block";
+      horario.style.display = "none";
+    } else if(vista === "horario"){
+      inicio.style.display = "none";
+      entrada.style.display = "none";
+      simulacion.style.display = "none";
+      cursos.style.display = "none";
+      horario.style.display = "block";
     } else {
       inicio.style.display = "block";
       entrada.style.display = "none";
       simulacion.style.display = "none";
       cursos.style.display = "none";
+      horario.style.display = "none";
     }
+    vistaActual = vista;
     document.body.classList.toggle("inicio-activo", vista === "inicio");
   }
 
@@ -1028,6 +1228,10 @@
   }
 
   function iniciarSimuladorCursos(){
+    mostrarVista("cursos");
+  }
+
+  function volverCursos(){
     mostrarVista("cursos");
   }
 
@@ -1210,7 +1414,7 @@
     return new Set([...checks].filter(check => check.checked).map(check => check.dataset.cursoId));
   }
 
-  function calcularNivelCiclo(aprobados){
+  function calcularNivelCicloDesde(aprobados, actualizarInput = true){
     const obligatorios = cursos.filter(curso => curso.tipo === "obligatorio");
     const niveles = [...new Set(obligatorios.map(curso => curso.nivel))].sort((a, b) => a - b);
     let nivelCompletado = 0;
@@ -1223,17 +1427,29 @@
     });
     const maxNivel = niveles[niveles.length - 1] || 0;
     const nivelCiclo = nivelCompletado >= maxNivel ? maxNivel : Math.max(1, nivelCompletado + 1);
-    const inputNivel = document.getElementById("nivelCulminado");
-    inputNivel.value = nivelCiclo;
+    if(actualizarInput){
+      const inputNivel = document.getElementById("nivelCulminado");
+      inputNivel.value = nivelCiclo;
+    }
     return { nivelCiclo, nivelCompletado };
+  }
+
+  function calcularCreditosDesde(aprobados, actualizarInput = true){
+    const total = [...aprobados].reduce((acc, id) => acc + (cursosPorId[id]?.creditos || 0), 0);
+    if(actualizarInput){
+      const inputCreditos = document.getElementById("creditosAprobados");
+      inputCreditos.value = total;
+    }
+    return total;
+  }
+
+  function calcularNivelCiclo(aprobados){
+    return calcularNivelCicloDesde(aprobados, true);
   }
 
   function calcularCreditosAprobados(){
     const aprobados = obtenerCursosAprobados();
-    const total = [...aprobados].reduce((acc, id) => acc + (cursosPorId[id]?.creditos || 0), 0);
-    const inputCreditos = document.getElementById("creditosAprobados");
-    inputCreditos.value = total;
-    return total;
+    return calcularCreditosDesde(aprobados, true);
   }
 
   function requisitosCumplidos(curso, aprobados, creditos, nivelCompletado){
@@ -1295,10 +1511,201 @@
     document.getElementById("nivelCulminado").value = 1;
     renderResultados("resultadoObligatorios", "emptyObligatorios", []);
     renderResultados("resultadoElectivos", "emptyElectivos", []);
+    renderSchedule();
+  }
+
+  const horarioState = {
+    badges: [],
+    counter: 1
+  };
+
+  function obtenerCursosPlaneados(){
+    return new Set(horarioState.badges.flatMap(badge => badge.cursos));
+  }
+
+  function agregarGafete(){
+    const id = `badge-${Date.now()}-${horarioState.counter}`;
+    horarioState.badges.push({
+      id,
+      titulo: `Ciclo ${horarioState.counter}`,
+      cursos: []
+    });
+    horarioState.counter += 1;
+    renderSchedule();
+  }
+
+  function eliminarGafete(id){
+    horarioState.badges = horarioState.badges.filter(badge => badge.id !== id);
+    renderSchedule();
+  }
+
+  function abrirHorario(){
+    if(horarioState.badges.length === 0){
+      agregarGafete();
+    } else {
+      renderSchedule();
+    }
+    mostrarVista("horario");
+  }
+
+  function renderSchedule(){
+    renderScheduleList();
+    renderScheduleBadges();
+  }
+
+  function renderScheduleList(){
+    const lista = document.getElementById("scheduleCourseList");
+    const empty = document.getElementById("scheduleEmpty");
+    if(!lista || !empty){
+      return;
+    }
+    const aprobadosBase = obtenerCursosAprobados();
+    const planeados = obtenerCursosPlaneados();
+    const aprobados = new Set([...aprobadosBase, ...planeados]);
+    const creditos = calcularCreditosDesde(aprobados, false);
+    const { nivelCompletado } = calcularNivelCicloDesde(aprobados, false);
+    const disponibles = cursos.filter(curso => !aprobados.has(curso.id) && requisitosCumplidos(curso, aprobados, creditos, nivelCompletado));
+
+    if(!disponibles.length){
+      lista.innerHTML = "";
+      empty.style.display = "block";
+      return;
+    }
+
+    empty.style.display = "none";
+    lista.innerHTML = disponibles.map(curso => `
+      <div class="schedule-item" draggable="true" data-curso-id="${curso.id}">
+        <strong>${curso.nombre}</strong>
+        <div class="course-tags">
+          <span>Nivel ${curso.nivel}</span>
+          <span>${curso.tipo === "obligatorio" ? "Obligatorio" : "Electivo"}</span>
+          <span>${curso.creditos} créditos</span>
+        </div>
+      </div>
+    `).join("");
+
+    lista.querySelectorAll(".schedule-item").forEach(item => {
+      item.addEventListener("dragstart", handleCourseDragStart);
+    });
+  }
+
+  function renderScheduleBadges(){
+    const contenedor = document.getElementById("scheduleBadges");
+    if(!contenedor){
+      return;
+    }
+    contenedor.innerHTML = horarioState.badges.map(badge => {
+      const cursosBadge = badge.cursos.map(cursoId => {
+        const curso = cursosPorId[cursoId];
+        if(!curso){
+          return "";
+        }
+        return `
+          <div class="badge-course" draggable="true" data-curso-id="${cursoId}" data-badge-id="${badge.id}">
+            <span>${curso.nombre}</span>
+            <button type="button" data-curso-id="${cursoId}" data-badge-id="${badge.id}">✕</button>
+          </div>
+        `;
+      }).join("");
+
+      const empty = badge.cursos.length === 0 ? `<div class="badge-empty">Arrastra cursos aquí</div>` : "";
+
+      return `
+        <div class="badge-card" data-badge-id="${badge.id}">
+          <div class="badge-header">
+            <input class="badge-title" type="text" value="${badge.titulo}" data-badge-id="${badge.id}">
+            <button class="btn-ghost badge-remove" type="button" data-badge-id="${badge.id}">Eliminar</button>
+          </div>
+          <div class="badge-dropzone" data-badge-id="${badge.id}">
+            ${empty}
+            ${cursosBadge}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    contenedor.querySelectorAll(".badge-title").forEach(input => {
+      input.addEventListener("input", event => {
+        const badge = horarioState.badges.find(item => item.id === event.target.dataset.badgeId);
+        if(badge){
+          badge.titulo = event.target.value.trim() || "Ciclo";
+        }
+      });
+    });
+
+    contenedor.querySelectorAll(".badge-remove").forEach(button => {
+      button.addEventListener("click", event => {
+        eliminarGafete(event.currentTarget.dataset.badgeId);
+      });
+    });
+
+    contenedor.querySelectorAll(".badge-dropzone").forEach(zone => {
+      zone.addEventListener("dragover", event => {
+        event.preventDefault();
+      });
+      zone.addEventListener("dragenter", event => {
+        event.preventDefault();
+        event.currentTarget.classList.add("drag-over");
+      });
+      zone.addEventListener("dragleave", event => {
+        event.currentTarget.classList.remove("drag-over");
+      });
+      zone.addEventListener("drop", event => {
+        event.preventDefault();
+        const cursoId = event.dataTransfer.getData("text/plain");
+        event.currentTarget.classList.remove("drag-over");
+        asignarCursoAGafete(cursoId, event.currentTarget.dataset.badgeId);
+      });
+    });
+
+    contenedor.querySelectorAll(".badge-course").forEach(item => {
+      item.addEventListener("dragstart", handleCourseDragStart);
+    });
+
+    contenedor.querySelectorAll(".badge-course button").forEach(button => {
+      button.addEventListener("click", event => {
+        const cursoId = event.currentTarget.dataset.cursoId;
+        const badgeId = event.currentTarget.dataset.badgeId;
+        removerCursoDeGafete(cursoId, badgeId);
+      });
+    });
+  }
+
+  function handleCourseDragStart(event){
+    event.dataTransfer.setData("text/plain", event.currentTarget.dataset.cursoId);
+    event.dataTransfer.effectAllowed = "move";
+  }
+
+  function asignarCursoAGafete(cursoId, badgeId){
+    if(!cursoId || !badgeId){
+      return;
+    }
+    horarioState.badges.forEach(badge => {
+      badge.cursos = badge.cursos.filter(id => id !== cursoId);
+    });
+    const destino = horarioState.badges.find(badge => badge.id === badgeId);
+    if(destino && !destino.cursos.includes(cursoId)){
+      destino.cursos.push(cursoId);
+    }
+    renderSchedule();
+  }
+
+  function removerCursoDeGafete(cursoId, badgeId){
+    const badge = horarioState.badges.find(item => item.id === badgeId);
+    if(!badge){
+      return;
+    }
+    badge.cursos = badge.cursos.filter(id => id !== cursoId);
+    renderSchedule();
   }
 
   renderChecklist();
-  document.getElementById("courseChecklist").addEventListener("change", simularCursos);
+  document.getElementById("courseChecklist").addEventListener("change", () => {
+    simularCursos();
+    if(vistaActual === "horario"){
+      renderSchedule();
+    }
+  });
   simularCursos();
 </script>
 </body>
