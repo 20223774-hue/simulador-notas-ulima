@@ -437,24 +437,6 @@
       gap:12px;
     }
 
-    .credits-summary{
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:10px 12px;
-      background:var(--tableHead);
-      font-size:13px;
-      color:var(--muted);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-    }
-
-    .credits-summary strong{
-      color:var(--text);
-      font-size:16px;
-    }
-
     .course-list{
       list-style:none;
       padding:0;
@@ -654,23 +636,18 @@
     </div>
 
     <div class="hint">
-      Completa tus créditos y nivel culminado si tienes requisitos por créditos o nivel.
+      Los créditos y el nivel de ciclo se calculan automáticamente según los cursos aprobados.
     </div>
 
     <div class="controls">
       <label>Créditos aprobados (auto)
         <input id="creditosAprobados" type="number" min="0" max="250" step="1" value="0" readonly>
       </label>
-      <label>Nivel culminado
-        <input id="nivelCulminado" type="number" min="0" max="10" step="1" value="0">
+      <label>Nivel de ciclo (auto)
+        <input id="nivelCulminado" type="number" min="0" max="10" step="1" value="1" readonly>
       </label>
       <button class="btn-primary" onclick="simularCursos()">Simular cursos disponibles</button>
       <button onclick="limpiarCursos()">Limpiar selección</button>
-    </div>
-
-    <div class="credits-summary">
-      <span>Créditos acumulados por cursos aprobados</span>
-      <strong id="creditosTotales">0</strong>
     </div>
 
     <div class="course-grid">
@@ -1199,17 +1176,33 @@
     return new Set([...checks].filter(check => check.checked).map(check => check.dataset.cursoId));
   }
 
+  function calcularNivelCiclo(aprobados){
+    const obligatorios = cursos.filter(curso => curso.tipo === "obligatorio");
+    const niveles = [...new Set(obligatorios.map(curso => curso.nivel))].sort((a, b) => a - b);
+    let nivelCompletado = 0;
+    niveles.forEach(nivel => {
+      const cursosNivel = obligatorios.filter(curso => curso.nivel === nivel);
+      const completado = cursosNivel.every(curso => aprobados.has(curso.id));
+      if(completado){
+        nivelCompletado = nivel;
+      }
+    });
+    const maxNivel = niveles[niveles.length - 1] || 0;
+    const nivelCiclo = nivelCompletado >= maxNivel ? maxNivel : Math.max(1, nivelCompletado + 1);
+    const inputNivel = document.getElementById("nivelCulminado");
+    inputNivel.value = nivelCiclo;
+    return { nivelCiclo, nivelCompletado };
+  }
+
   function calcularCreditosAprobados(){
     const aprobados = obtenerCursosAprobados();
     const total = [...aprobados].reduce((acc, id) => acc + (cursosPorId[id]?.creditos || 0), 0);
     const inputCreditos = document.getElementById("creditosAprobados");
-    const display = document.getElementById("creditosTotales");
     inputCreditos.value = total;
-    display.textContent = total;
     return total;
   }
 
-  function requisitosCumplidos(curso, aprobados, creditos, nivel){
+  function requisitosCumplidos(curso, aprobados, creditos, nivelCompletado){
     return curso.requisitos.every(req => {
       if(req.tipo === "curso"){
         return aprobados.has(req.id);
@@ -1218,7 +1211,7 @@
         return creditos >= req.valor;
       }
       if(req.tipo === "nivel"){
-        return nivel >= req.valor;
+        return nivelCompletado >= req.valor;
       }
       return false;
     });
@@ -1227,9 +1220,9 @@
   function simularCursos(){
     const aprobados = obtenerCursosAprobados();
     const creditos = calcularCreditosAprobados();
-    const nivel = Number(document.getElementById("nivelCulminado").value) || 0;
+    const { nivelCompletado } = calcularNivelCiclo(aprobados);
 
-    const disponibles = cursos.filter(curso => !aprobados.has(curso.id) && requisitosCumplidos(curso, aprobados, creditos, nivel));
+    const disponibles = cursos.filter(curso => !aprobados.has(curso.id) && requisitosCumplidos(curso, aprobados, creditos, nivelCompletado));
     const obligatorios = disponibles.filter(curso => curso.tipo === "obligatorio");
     const electivos = disponibles.filter(curso => curso.tipo === "electivo");
 
@@ -1265,18 +1258,13 @@
       check.checked = false;
     });
     document.getElementById("creditosAprobados").value = 0;
-    document.getElementById("creditosTotales").textContent = 0;
-    document.getElementById("nivelCulminado").value = 0;
+    document.getElementById("nivelCulminado").value = 1;
     renderResultados("resultadoObligatorios", "emptyObligatorios", []);
     renderResultados("resultadoElectivos", "emptyElectivos", []);
   }
 
   renderChecklist();
-  document.getElementById("courseChecklist").addEventListener("change", () => {
-    calcularCreditosAprobados();
-    simularCursos();
-  });
-  document.getElementById("nivelCulminado").addEventListener("input", simularCursos);
+  document.getElementById("courseChecklist").addEventListener("change", simularCursos);
   simularCursos();
 </script>
 </body>
