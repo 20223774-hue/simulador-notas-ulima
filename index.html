@@ -484,6 +484,19 @@
       word-break:break-word;
     }
 
+    .req-list{
+      margin:6px 0 0;
+      padding-left:18px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      line-height:1.45;
+    }
+
+    .req-list li{
+      margin:0;
+    }
+
     .course-empty{
       padding:12px;
       border-radius:12px;
@@ -1188,7 +1201,8 @@
       }
       return "Requisito";
     });
-    return `Requisitos: ${partes.join(" · ")}`;
+    const lista = partes.map(parte => `<li>${parte}</li>`).join("");
+    return `Requisitos:<ul class="req-list">${lista}</ul>`;
   }
 
   function obtenerCursosAprobados(){
