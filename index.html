@@ -396,6 +396,27 @@
       font-size:14px;
     }
 
+    .course-level-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .level-toggle{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .level-toggle input{
+      width:auto;
+    }
+
     .checkbox-grid{
       display:grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1362,7 +1383,7 @@
         const cursosNivel = cursosTipo.filter(curso => curso.nivel === nivel);
         const items = cursosNivel.map(curso => `
           <label class="course-item">
-            <input type="checkbox" data-curso-id="${curso.id}">
+            <input type="checkbox" data-curso-id="${curso.id}" data-nivel="${nivel}" data-tipo="${tipo.key}">
             <div class="course-meta">
               <span>${curso.nombre}</span>
               <small>${curso.creditos} créditos · ${formatearRequisitos(curso)}</small>
@@ -1372,7 +1393,13 @@
 
         return `
           <div class="course-card">
-            <h4>Nivel ${nivel}</h4>
+            <h4 class="course-level-header">
+              <span>Nivel ${nivel}</span>
+              <label class="level-toggle">
+                <input type="checkbox" data-nivel="${nivel}" data-tipo="${tipo.key}" class="level-toggle-input">
+                Marcar todo
+              </label>
+            </h4>
             <div class="checkbox-grid">
               ${items}
             </div>
@@ -1411,7 +1438,18 @@
 
   function obtenerCursosAprobados(){
     const checks = document.querySelectorAll("#courseChecklist input[type='checkbox']");
-    return new Set([...checks].filter(check => check.checked).map(check => check.dataset.cursoId));
+    return new Set([...checks].filter(check => check.checked && check.dataset.cursoId).map(check => check.dataset.cursoId));
+  }
+
+  function actualizarTogglesNivel(){
+    const toggles = document.querySelectorAll(".level-toggle-input");
+    toggles.forEach(toggle => {
+      const nivel = toggle.dataset.nivel;
+      const tipo = toggle.dataset.tipo;
+      const cursosNivel = document.querySelectorAll(`#courseChecklist input[type='checkbox'][data-curso-id][data-nivel='${nivel}'][data-tipo='${tipo}']`);
+      const todosMarcados = [...cursosNivel].length > 0 && [...cursosNivel].every(check => check.checked);
+      toggle.checked = todosMarcados;
+    });
   }
 
   function calcularNivelCicloDesde(aprobados, actualizarInput = true){
@@ -1723,13 +1761,24 @@
   }
 
   renderChecklist();
-  document.getElementById("courseChecklist").addEventListener("change", () => {
+  document.getElementById("courseChecklist").addEventListener("change", (event) => {
+    const target = event.target;
+    if(target && target.classList.contains("level-toggle-input")){
+      const nivel = target.dataset.nivel;
+      const tipo = target.dataset.tipo;
+      const cursosNivel = document.querySelectorAll(`#courseChecklist input[type='checkbox'][data-curso-id][data-nivel='${nivel}'][data-tipo='${tipo}']`);
+      cursosNivel.forEach(check => {
+        check.checked = target.checked;
+      });
+    }
+    actualizarTogglesNivel();
     simularCursos();
     if(vistaActual === "horario"){
       renderSchedule();
     }
   });
   simularCursos();
+  actualizarTogglesNivel();
 </script>
 </body>
 </html>
