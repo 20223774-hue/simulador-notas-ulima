@@ -362,12 +362,123 @@
       white-space:nowrap;
     }
 
+    .course-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      margin-top:14px;
+      align-items:start;
+    }
+
+    .course-section{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow2);
+      background:var(--card);
+    }
+
+    .course-section h3{
+      margin:0 0 12px;
+      font-size:16px;
+    }
+
+    .course-card{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:12px;
+      background:var(--rowA);
+    }
+
+    .course-card h4{
+      margin:0 0 10px;
+      font-size:14px;
+    }
+
+    .checkbox-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:10px 16px;
+    }
+
+    .course-item{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      font-size:13px;
+      color:var(--text);
+    }
+
+    .course-item input{
+      width:auto;
+      margin-top:3px;
+    }
+
+    .course-meta{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .course-meta span{
+      font-weight:700;
+    }
+
+    .course-meta small{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.3;
+    }
+
+    .course-results{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .course-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .course-list li{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+      background:var(--rowA);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .course-tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .course-empty{
+      padding:12px;
+      border-radius:12px;
+      border:1px dashed var(--border);
+      color:var(--muted);
+      font-size:13px;
+    }
+
     /* ✅ Responsive para celular */
     @media (max-width: 900px){
       body{ padding:14px; }
       .box{ padding:14px; }
       .grid,
-      .sim-grid{ grid-template-columns: 1fr; }
+      .sim-grid,
+      .course-grid{ grid-template-columns: 1fr; }
       .inicio{ min-height: calc(100vh - 28px); }
       .inicio-content{ padding:24px; }
       .controls{ gap:8px; }
@@ -506,6 +617,58 @@
         </div>
         <div class="small" style="margin-top:10px;">
           Tip: en celular puedes deslizar la tabla de simulación hacia los lados.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="vistaCursos" style="display:none;">
+    <div class="topbar">
+      <div>
+        <h2>Simulador de cursos ULima</h2>
+        <div class="subtitle">Marca los cursos que ya aprobaste y descubre los que puedes llevar.</div>
+        <div class="creator">Creador: Sebastián Mory Ricse</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost btn-theme" onclick="toggleTheme()">🌙 Dark mode</button>
+        <button class="btn-secondary" onclick="volverInicio()">Inicia</button>
+      </div>
+    </div>
+
+    <div class="hint">
+      Completa tus créditos y nivel culminado si tienes requisitos por créditos o nivel.
+    </div>
+
+    <div class="controls">
+      <label>Créditos aprobados
+        <input id="creditosAprobados" type="number" min="0" max="250" step="1" value="0">
+      </label>
+      <label>Nivel culminado
+        <input id="nivelCulminado" type="number" min="0" max="10" step="1" value="0">
+      </label>
+      <button class="btn-primary" onclick="simularCursos()">Simular cursos disponibles</button>
+      <button onclick="limpiarCursos()">Limpiar selección</button>
+    </div>
+
+    <div class="course-grid">
+      <div class="course-section">
+        <h3>✅ Cursos aprobados</h3>
+        <div id="courseChecklist"></div>
+      </div>
+      <div class="course-section course-results">
+        <div>
+          <h3>📘 Obligatorias disponibles</h3>
+          <ul class="course-list" id="resultadoObligatorios"></ul>
+          <div class="course-empty" id="emptyObligatorios" style="display:none;">
+            Aún no hay cursos obligatorios disponibles con los requisitos actuales.
+          </div>
+        </div>
+        <div>
+          <h3>🎓 Electivos disponibles</h3>
+          <ul class="course-list" id="resultadoElectivos"></ul>
+          <div class="course-empty" id="emptyElectivos" style="display:none;">
+            Aún no hay cursos electivos disponibles con los requisitos actuales.
+          </div>
         </div>
       </div>
     </div>
@@ -794,18 +957,27 @@
     const inicio = document.getElementById("vistaInicio");
     const entrada = document.getElementById("vistaEntrada");
     const simulacion = document.getElementById("vistaSimulacion");
+    const cursos = document.getElementById("vistaCursos");
     if(vista === "simulacion"){
       inicio.style.display = "none";
       entrada.style.display = "none";
       simulacion.style.display = "block";
+      cursos.style.display = "none";
     } else if(vista === "entrada"){
       inicio.style.display = "none";
       entrada.style.display = "block";
       simulacion.style.display = "none";
+      cursos.style.display = "none";
+    } else if(vista === "cursos"){
+      inicio.style.display = "none";
+      entrada.style.display = "none";
+      simulacion.style.display = "none";
+      cursos.style.display = "block";
     } else {
       inicio.style.display = "block";
       entrada.style.display = "none";
       simulacion.style.display = "none";
+      cursos.style.display = "none";
     }
     document.body.classList.toggle("inicio-activo", vista === "inicio");
   }
@@ -823,13 +995,249 @@
   }
 
   function iniciarSimuladorCursos(){
-    alert("Pronto: simulador de cursos.");
+    mostrarVista("cursos");
   }
 
   setupCanvas();
   updateParticles();
   mostrarVista("inicio");
   calcular();
+
+  const cursos = [
+    { id:"lenguaje-1", nombre:"Lenguaje y Comunicación I", nivel:1, tipo:"obligatorio", requisitos:[] },
+    { id:"intro-ingenieria", nombre:"Introducción a la Ingeniería", nivel:1, tipo:"obligatorio", requisitos:[] },
+    { id:"desarrollo-personal", nombre:"Desarrollo Personal y Social", nivel:1, tipo:"obligatorio", requisitos:[] },
+    { id:"metodologias-investigacion", nombre:"Metodologías de la Investigación", nivel:1, tipo:"obligatorio", requisitos:[] },
+    { id:"etica-civica", nombre:"Ética Cívica", nivel:1, tipo:"obligatorio", requisitos:[] },
+    { id:"matematica-basica", nombre:"Matemática Básica", nivel:1, tipo:"obligatorio", requisitos:[] },
+
+    { id:"lenguaje-2", nombre:"Lenguaje y Comunicación II", nivel:2, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"lenguaje-1" }] },
+    { id:"procesos-sociales", nombre:"Procesos Sociales y Políticos", nivel:2, tipo:"obligatorio", requisitos:[] },
+    { id:"algebra-lineal", nombre:"Álgebra Lineal", nivel:2, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"matematica-basica" }] },
+    { id:"economia-empresa", nombre:"Economía y Empresa", nivel:2, tipo:"obligatorio", requisitos:[] },
+    { id:"temas-filosofia", nombre:"Temas de Filosofía", nivel:2, tipo:"obligatorio", requisitos:[] },
+    { id:"calculo-1", nombre:"Cálculo I", nivel:2, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"matematica-basica" }] },
+
+    { id:"sistemas-organizacionales", nombre:"Sistemas Organizacionales", nivel:3, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"economia-empresa" }] },
+    { id:"diseno-cad", nombre:"Diseño Asistido por el Computador", nivel:3, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"algebra-lineal" }] },
+    { id:"ia-aplicada", nombre:"Inteligencia Artificial Aplicada", nivel:3, tipo:"obligatorio", requisitos:[] },
+    { id:"fisica-1", nombre:"Física I", nivel:3, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"calculo-1" }] },
+    { id:"quimica-general", nombre:"Química General", nivel:3, tipo:"obligatorio", requisitos:[] },
+    { id:"calculo-2", nombre:"Cálculo II", nivel:3, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"calculo-1" }] },
+
+    { id:"costeo-operaciones", nombre:"Costeo de Operaciones", nivel:4, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"sistemas-organizacionales" }] },
+    { id:"fundamentos-programacion", nombre:"Fundamentos de Programación", nivel:4, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"ia-aplicada" }] },
+    { id:"fisica-2", nombre:"Física II", nivel:4, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"fisica-1" }] },
+    { id:"estadistica-probabilidad", nombre:"Estadística y Probabilidad", nivel:4, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"calculo-1" }] },
+    { id:"mecanica", nombre:"Mecánica", nivel:4, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"fisica-1" }, { tipo:"curso", id:"diseno-cad" }] },
+    { id:"calculo-3", nombre:"Cálculo III", nivel:4, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"calculo-2" }] },
+
+    { id:"io-1", nombre:"Investigación de Operaciones I", nivel:5, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"fundamentos-programacion" }] },
+    { id:"fundamentos-logistica", nombre:"Fundamentos de Operaciones y Logística", nivel:5, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"costeo-operaciones" }] },
+    { id:"ingenieria-economica", nombre:"Ingeniería Económica", nivel:5, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"costeo-operaciones" }] },
+    { id:"electricidad-electronica", nombre:"Electricidad y Electrónica", nivel:5, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"fisica-2" }] },
+    { id:"ecuaciones-diferenciales", nombre:"Ecuaciones Diferenciales", nivel:5, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"calculo-3" }] },
+    { id:"diseno-experimentos", nombre:"Diseño de Experimentos", nivel:5, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"estadistica-probabilidad" }] },
+
+    { id:"io-2", nombre:"Investigación de Operaciones II", nivel:6, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"io-1" }] },
+    { id:"ergonomia", nombre:"Ergonomía y Diseño del Trabajo", nivel:6, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"estadistica-probabilidad" }] },
+    { id:"innovacion-ingenieria", nombre:"Innovación en Ingeniería", nivel:6, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"electricidad-electronica" }, { tipo:"curso", id:"mecanica" }] },
+    { id:"planeamiento-control", nombre:"Planeamiento y Control de Operaciones", nivel:6, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"fundamentos-logistica" }] },
+    { id:"procesos-industriales", nombre:"Procesos Industriales", nivel:6, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"quimica-general" }, { tipo:"curso", id:"fisica-2" }] },
+
+    { id:"ingenieria-financiera", nombre:"Ingeniería Financiera", nivel:7, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"ingenieria-economica" }] },
+    { id:"diseno-instalaciones", nombre:"Diseño de Instalaciones", nivel:7, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"ergonomia" }] },
+    { id:"inteligencia-negocios", nombre:"Inteligencia de Negocios", nivel:7, tipo:"obligatorio", requisitos:[{ tipo:"nivel", valor:5 }] },
+    { id:"modelos-logisticos", nombre:"Modelos de Sistemas Logísticos", nivel:7, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"fundamentos-logistica" }] },
+    { id:"calidad", nombre:"Calidad", nivel:7, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"diseno-experimentos" }] },
+    { id:"procesos-manufactura", nombre:"Procesos de Manufactura", nivel:7, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"innovacion-ingenieria" }] },
+
+    { id:"simulacion-procesos", nombre:"Simulación de Procesos", nivel:8, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"io-2" }] },
+    { id:"modelamiento-predictivo", nombre:"Modelamiento Predictivo de Datos", nivel:8, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"inteligencia-negocios" }] },
+    { id:"sistemas-gestion", nombre:"Sistemas Integrados de Gestión", nivel:8, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"calidad" }] },
+    { id:"gestion-proyectos", nombre:"Gestión de Proyectos", nivel:8, tipo:"obligatorio", requisitos:[{ tipo:"nivel", valor:6 }] },
+    { id:"analisis-problemas", nombre:"Análisis de Problemas de Ingeniería", nivel:8, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"modelos-logisticos" }, { tipo:"curso", id:"calidad" }] },
+    { id:"automatizacion-industrial", nombre:"Automatización Industrial", nivel:8, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"procesos-manufactura" }] },
+
+    { id:"etica-gestion", nombre:"Ética y Gestión Humana", nivel:9, tipo:"obligatorio", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"proyecto-aplicada-1", nombre:"Proyecto de Ingeniería Aplicada I", nivel:9, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"analisis-problemas" }] },
+    { id:"ingenieria-comercial", nombre:"Ingeniería Comercial", nivel:9, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"modelos-logisticos" }] },
+
+    { id:"proyecto-aplicada-2", nombre:"Proyecto de Ingeniería Aplicada II", nivel:10, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"proyecto-aplicada-1" }, { tipo:"curso", id:"simulacion-procesos" }] },
+    { id:"gerencia-estrategica", nombre:"Gerencia Estratégica", nivel:10, tipo:"obligatorio", requisitos:[{ tipo:"curso", id:"ingenieria-financiera" }, { tipo:"curso", id:"ingenieria-comercial" }] },
+
+    { id:"globalizacion", nombre:"Globalización, Capitalismo y Ciencia en el Mundo Contemporáneo", nivel:6, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:80 }] },
+    { id:"taller-liderazgo", nombre:"Taller de Liderazgo", nivel:6, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:80 }] },
+    { id:"programacion-ingenieria", nombre:"Programación para Ingeniería", nivel:6, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:80 }] },
+
+    { id:"sistemas-info", nombre:"Sistemas de Información Gerencial", nivel:7, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:100 }] },
+    { id:"taller-habilidades", nombre:"Taller de Habilidades Gerenciales", nivel:7, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:100 }] },
+
+    { id:"tecnologia-industrial", nombre:"Tecnología Industrial", nivel:8, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"intro-bd", nombre:"Introducción a Sistemas de Gestión de Bases de Datos", nivel:8, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"creatividad", nombre:"Creatividad, Innovación y Emprendimiento", nivel:8, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"lean-six-sigma", nombre:"Lean Six Sigma", nivel:8, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"gestion-servicios", nombre:"Gestión de Operaciones de Servicios", nivel:8, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+
+    { id:"gestion-proyectos-diseno", nombre:"Gestión de Proyectos de Diseño", nivel:9, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"supply-chain", nombre:"Supply Chain Management", nivel:9, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"compras-abastecimiento", nombre:"Compras y Gestión del Abastecimiento", nivel:9, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"formulacion-proyectos", nombre:"Formulación y Evaluación de Proyectos", nivel:9, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"metodologias-agiles", nombre:"Metodologías Ágiles", nivel:9, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"comercio-internacional", nombre:"Gestión del Comercio Internacional", nivel:9, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"diseno-prototipado", nombre:"Diseño y Prototipado", nivel:9, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"machine-learning", nombre:"Machine Learning", nivel:9, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"herramientas-informaticas", nombre:"Herramientas Informáticas", nivel:9, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"sostenibilidad-industrial", nombre:"Sostenibilidad Industrial", nivel:9, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+
+    { id:"transformacion-digital", nombre:"Transformación Digital", nivel:10, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"estrategia-inteligencia", nombre:"Estrategia de Inteligencia Empresarial", nivel:10, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"juego-negocios", nombre:"Juego de Negocios", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"direccion-proyectos", nombre:"Dirección en Implementación de Proyectos", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"diseno-proyectos", nombre:"Diseño de Proyectos Sostenibles", nivel:10, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"tecnologias-programacion", nombre:"Tecnologías de Programación", nivel:10, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"rpa", nombre:"Robotic Process Automation", nivel:10, tipo:"electivo", requisitos:[{ tipo:"nivel", valor:7 }] },
+    { id:"procesos-logisticos-erp", nombre:"Procesos Logísticos ERP", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"ingenieria-transporte", nombre:"Ingeniería del Transporte y Distribución", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"gestion-recursos", nombre:"Gestión de Recursos", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"gestion-riesgos", nombre:"Gestión de Riesgos y Portafolios", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"gerencia-b2b", nombre:"Gerencia B2B", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] },
+    { id:"marketing-digital", nombre:"Herramientas de Marketing Digital", nivel:10, tipo:"electivo", requisitos:[{ tipo:"creditos", valor:120 }] }
+  ];
+
+  const cursosPorId = cursos.reduce((acc, curso) => {
+    acc[curso.id] = curso;
+    return acc;
+  }, {});
+
+  function renderChecklist(){
+    const contenedor = document.getElementById("courseChecklist");
+    const tipos = [
+      { key:"obligatorio", label:"📘 Cursos obligatorios" },
+      { key:"electivo", label:"🎓 Cursos electivos" }
+    ];
+
+    contenedor.innerHTML = tipos.map((tipo) => {
+      const cursosTipo = cursos.filter(curso => curso.tipo === tipo.key);
+      const niveles = [...new Set(cursosTipo.map(curso => curso.nivel))].sort((a,b) => a - b);
+
+      const cards = niveles.map(nivel => {
+        const cursosNivel = cursosTipo.filter(curso => curso.nivel === nivel);
+        const items = cursosNivel.map(curso => `
+          <label class="course-item">
+            <input type="checkbox" data-curso-id="${curso.id}">
+            <div class="course-meta">
+              <span>${curso.nombre}</span>
+              <small>${formatearRequisitos(curso)}</small>
+            </div>
+          </label>
+        `).join("");
+
+        return `
+          <div class="course-card">
+            <h4>Nivel ${nivel}</h4>
+            <div class="checkbox-grid">
+              ${items}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="course-card">
+          <h3>${tipo.label}</h3>
+          ${cards}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function formatearRequisitos(curso){
+    if(!curso.requisitos.length){
+      return "Sin requisitos";
+    }
+    const partes = curso.requisitos.map(req => {
+      if(req.tipo === "curso"){
+        return cursosPorId[req.id]?.nombre || "Curso previo";
+      }
+      if(req.tipo === "creditos"){
+        return `Créditos aprobados: ${req.valor}`;
+      }
+      if(req.tipo === "nivel"){
+        return `Culminar nivel ${req.valor}`;
+      }
+      return "Requisito";
+    });
+    return `Requisitos: ${partes.join(" · ")}`;
+  }
+
+  function obtenerCursosAprobados(){
+    const checks = document.querySelectorAll("#courseChecklist input[type='checkbox']");
+    return new Set([...checks].filter(check => check.checked).map(check => check.dataset.cursoId));
+  }
+
+  function requisitosCumplidos(curso, aprobados, creditos, nivel){
+    return curso.requisitos.every(req => {
+      if(req.tipo === "curso"){
+        return aprobados.has(req.id);
+      }
+      if(req.tipo === "creditos"){
+        return creditos >= req.valor;
+      }
+      if(req.tipo === "nivel"){
+        return nivel >= req.valor;
+      }
+      return false;
+    });
+  }
+
+  function simularCursos(){
+    const aprobados = obtenerCursosAprobados();
+    const creditos = Number(document.getElementById("creditosAprobados").value) || 0;
+    const nivel = Number(document.getElementById("nivelCulminado").value) || 0;
+
+    const disponibles = cursos.filter(curso => !aprobados.has(curso.id) && requisitosCumplidos(curso, aprobados, creditos, nivel));
+    const obligatorios = disponibles.filter(curso => curso.tipo === "obligatorio");
+    const electivos = disponibles.filter(curso => curso.tipo === "electivo");
+
+    renderResultados("resultadoObligatorios", "emptyObligatorios", obligatorios);
+    renderResultados("resultadoElectivos", "emptyElectivos", electivos);
+  }
+
+  function renderResultados(listaId, emptyId, cursosDisponibles){
+    const lista = document.getElementById(listaId);
+    const empty = document.getElementById(emptyId);
+    if(!cursosDisponibles.length){
+      lista.innerHTML = "";
+      empty.style.display = "block";
+      return;
+    }
+
+    empty.style.display = "none";
+    lista.innerHTML = cursosDisponibles.map(curso => `
+      <li>
+        <strong>${curso.nombre}</strong>
+        <div class="course-tags">
+          <span>Nivel ${curso.nivel}</span>
+          <span>${curso.tipo === "obligatorio" ? "Obligatorio" : "Electivo"}</span>
+        </div>
+        <div class="course-tags">${formatearRequisitos(curso)}</div>
+      </li>
+    `).join("");
+  }
+
+  function limpiarCursos(){
+    document.querySelectorAll("#courseChecklist input[type='checkbox']").forEach(check => {
+      check.checked = false;
+    });
+    document.getElementById("creditosAprobados").value = 0;
+    document.getElementById("nivelCulminado").value = 0;
+    renderResultados("resultadoObligatorios", "emptyObligatorios", []);
+    renderResultados("resultadoElectivos", "emptyElectivos", []);
+  }
+
+  renderChecklist();
+  simularCursos();
 </script>
 </body>
 </html>
