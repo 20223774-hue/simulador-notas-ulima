@@ -126,15 +126,15 @@
       letter-spacing:.5px;
     }
 
-    .inicio-subtitle{
-      margin-top:8px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.5;
+    .inicio-actions{
+      margin-top:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      align-items:center;
     }
 
     .btn-start{
-      margin-top:18px;
       padding:12px 24px;
       border-radius:999px;
       border:1px solid transparent;
@@ -148,6 +148,32 @@
     html[data-theme="dark"] .btn-start{
       background: linear-gradient(135deg, #60a5fa, #3b82f6);
       box-shadow: 0 16px 30px rgba(59,130,246,.25);
+    }
+
+    .btn-secondary{
+      background:transparent;
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:800;
+      letter-spacing:.3px;
+      padding:12px 24px;
+      border-radius:999px;
+      box-shadow: 0 12px 24px rgba(15,23,42,.12);
+    }
+
+    .inicio-creator{
+      position:absolute;
+      left:18px;
+      bottom:16px;
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .inicio-creator b{
+      color:var(--text);
     }
 
     .topbar{
@@ -356,33 +382,19 @@
 </head>
 
 <body>
-<body>
 <div class="box">
-
-  <div class="topbar">
-    <div>
-      <h2>Simulador de Notas ULima (para no repetir el ciclo)</h2>
-      <div class="subtitle">
-        Aprobación 10.5 · Notas 1–20 · El promedio no perdona
-      </div>
-      <div class="creator">
-        Creador: <b>Sebastián Mory Ricse</b>
-      </div>
-    </div>
-    <button id="btnTheme" class="btn-ghost" onclick="toggleTheme()">🌙 Dark mode</button>
-  </div>
 
   <section id="vistaInicio">
     <div class="inicio">
       <canvas id="mathCanvas" aria-hidden="true"></canvas>
       <div class="inicio-content">
-        <h1 class="inicio-title">Simulador de Notas ULima</h1>
-        <p class="inicio-subtitle">
-          Proyecta escenarios de notas con un estilo claro y directo. Tus porcentajes,
-          tus promedios y la simulación en un solo paso.
-        </p>
-        <button class="btn-start" onclick="iniciarSimulador()">Iniciar simulador</button>
+        <h1 class="inicio-title">Simulador de notas</h1>
+        <div class="inicio-actions">
+          <button class="btn-start" onclick="iniciarSimulador()">Ingresar a simulador de notas</button>
+          <button class="btn-secondary" onclick="iniciarSimuladorCursos()">📘 Simulador de cursos</button>
+        </div>
       </div>
+      <div class="inicio-creator">Creador: <b>Sebastián Mory Ricse</b></div>
     </div>
   </section>
 
@@ -816,6 +828,10 @@
 
   function iniciarSimulador(){
     mostrarVista("entrada");
+  }
+
+  function iniciarSimuladorCursos(){
+    alert("Pronto: simulador de cursos.");
   }
 
   setupCanvas();
