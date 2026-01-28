@@ -596,6 +596,13 @@
       flex-wrap:wrap;
     }
 
+    .schedule-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
     .badge-grid{
       display:flex;
       flex-direction:column;
@@ -907,7 +914,10 @@
       <div class="schedule-section">
         <div class="schedule-header">
           <h3>🗂️ Gafetes por ciclo</h3>
-          <button class="btn-primary" onclick="agregarGafete()">+ Agregar gafete</button>
+          <div class="schedule-actions">
+            <button class="btn-ghost" type="button" onclick="guardarGafetesPdf()">Guardar PDF</button>
+            <button class="btn-primary" type="button" onclick="agregarGafete()">+ Agregar gafete</button>
+          </div>
         </div>
         <div class="badge-grid" id="scheduleBadges"></div>
       </div>
@@ -1758,6 +1768,111 @@
     }
     badge.cursos = badge.cursos.filter(id => id !== cursoId);
     renderSchedule();
+  }
+
+  function escapeHtml(value){
+    return String(value).replace(/[&<>"']/g, (char) => {
+      const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      };
+      return map[char] || char;
+    });
+  }
+
+  function guardarGafetesPdf(){
+    if(horarioState.badges.length === 0){
+      alert("Agrega al menos un gafete antes de guardar.");
+      return;
+    }
+
+    const contenidoBadges = horarioState.badges.map((badge, index) => {
+      const titulo = escapeHtml(badge.titulo || `Ciclo ${index + 1}`);
+      const cursos = badge.cursos
+        .map((cursoId) => cursosPorId[cursoId])
+        .filter(Boolean)
+        .map((curso) => `<li>${escapeHtml(curso.nombre)}</li>`)
+        .join("");
+      const detalle = cursos || '<li class="badge-empty">Sin cursos asignados</li>';
+
+      return `
+        <section class="badge-card">
+          <h2>${titulo}</h2>
+          <ul>${detalle}</ul>
+        </section>
+      `;
+    }).join("");
+
+    const plantilla = `
+      <!doctype html>
+      <html lang="es">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Gafetes por ciclo</title>
+          <style>
+            *{ box-sizing:border-box; }
+            body{
+              font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+              margin:24px;
+              color:#0f172a;
+              background:white;
+            }
+            h1{
+              margin:0 0 16px;
+              font-size:22px;
+            }
+            .badge-grid{
+              display:flex;
+              flex-direction:column;
+              gap:16px;
+            }
+            .badge-card{
+              border:1px solid #e2e8f0;
+              border-radius:14px;
+              padding:14px 16px;
+            }
+            .badge-card h2{
+              margin:0 0 10px;
+              font-size:18px;
+            }
+            .badge-card ul{
+              margin:0;
+              padding-left:18px;
+              display:flex;
+              flex-direction:column;
+              gap:6px;
+            }
+            .badge-empty{
+              color:#64748b;
+              font-style:italic;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>🗂️ Gafetes por ciclo</h1>
+          <div class="badge-grid">
+            ${contenidoBadges}
+          </div>
+        </body>
+      </html>
+    `;
+
+    const ventana = window.open("", "_blank", "width=1024,height=768");
+    if(!ventana){
+      alert("No se pudo abrir la ventana para guardar el PDF.");
+      return;
+    }
+    ventana.document.write(plantilla);
+    ventana.document.close();
+    ventana.focus();
+    ventana.onload = () => {
+      ventana.print();
+      ventana.close();
+    };
   }
 
   renderChecklist();
