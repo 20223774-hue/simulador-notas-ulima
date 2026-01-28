@@ -872,7 +872,7 @@
     </div>
 
     <div class="hint">
-      Al mover cursos a un gafete, se consideran cursados y desbloquean nuevos cursos disponibles.
+      Al mover cursos a un gafete, se consideran cursados y desbloquean nuevos cursos disponibles. Los requisitos, créditos y nivel se evalúan por ciclo: solo puedes colocar un curso si lo cumpliste en ciclos anteriores.
     </div>
 
     <div class="schedule-grid">
@@ -1680,6 +1680,10 @@
     if(!cursoId || !badgeId){
       return;
     }
+    if(!puedeAsignarCursoAGafete(cursoId, badgeId)){
+      alert("No puedes colocar este curso en este ciclo. Sus requisitos, créditos o nivel deben estar completados en ciclos anteriores.");
+      return;
+    }
     horarioState.badges.forEach(badge => {
       badge.cursos = badge.cursos.filter(id => id !== cursoId);
     });
@@ -1688,6 +1692,25 @@
       destino.cursos.push(cursoId);
     }
     renderSchedule();
+  }
+
+  function puedeAsignarCursoAGafete(cursoId, badgeId){
+    const curso = cursosPorId[cursoId];
+    if(!curso){
+      return false;
+    }
+    const badgeIndex = horarioState.badges.findIndex(badge => badge.id === badgeId);
+    if(badgeIndex < 0){
+      return false;
+    }
+    const aprobados = obtenerCursosAprobados();
+    const cursosPrevios = horarioState.badges
+      .slice(0, badgeIndex)
+      .flatMap(badge => badge.cursos);
+    const base = new Set([...aprobados, ...cursosPrevios]);
+    const creditos = calcularCreditosDesde(base, false);
+    const { nivelCompletado } = calcularNivelCicloDesde(base, false);
+    return requisitosCumplidos(curso, base, creditos, nivelCompletado);
   }
 
   function removerCursoDeGafete(cursoId, badgeId){
