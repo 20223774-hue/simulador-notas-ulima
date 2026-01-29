@@ -709,57 +709,70 @@ tbody tr:hover td{ background:var(--hover); }
    ------------------------- */
 #mascota{
   position:fixed;            /* fijo sobre toda la página */
-  width:40px;
-  height:40px;
+  width:46px;
+  height:46px;
   bottom:120px;              /* valor inicial - se ajusta por JS */
   left:20px;                 /* valor inicial - se ajusta por JS */
   z-index:9999;              /* z-index alto */
   pointer-events:none;       /* NO debe bloquear inputs ni botones */
   transition: transform 220ms linear, left 400ms ease, bottom 220ms ease, opacity 400ms ease;
   will-change: transform, left, opacity;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:10px;
-  color:transparent;
-  /* apariencia "pixel" simple con box-shadow */
-  background:
-    /* cuerpo (2x2 pixels style) */
-    linear-gradient(#0f172a 0 0) content-box;
-  border-radius:6px;
-  box-shadow:
-    4px 4px 0 0 #111827,
-    -6px 6px 0 0 #1f2937,
-    6px -4px 0 0 #334155;
-  opacity:0.98;
+  display:block;
 }
 
-/* Dibujo simple para cara/ojos usando pseudo-elementos */
-#mascota::before{
-  content:"";
+#mascota .cat{
   position:absolute;
-  width:28px;
-  height:28px;
-  background:
-    /* eyes and face stylized using linear-gradients */
-    linear-gradient(#f3f4f6 0 0) center/100% 100% no-repeat;
-  border-radius:4px;
-  top:6px;
-  left:6px;
-  box-shadow: inset -1px -2px 0 0 rgba(0,0,0,0.06);
-}
-#mascota::after{
-  content:"";
-  position:absolute;
-  width:6px;
-  height:6px;
-  background:#0b1220;
+  top:5px;
+  left:5px;
+  width:4px;
+  height:4px;
+  background:#1f2937;
   border-radius:1px;
-  top:16px;
-  left:13px;
   box-shadow:
-    12px 0 0 0 #0b1220,
-    4px 8px 0 0 rgba(255,255,255,0.05);
+    16px 0 0 0 #1f2937,
+    -4px 4px 0 0 #1f2937,
+    0 4px 0 0 #1f2937,
+    4px 4px 0 0 #1f2937,
+    12px 4px 0 0 #1f2937,
+    16px 4px 0 0 #1f2937,
+    20px 4px 0 0 #1f2937,
+    -8px 8px 0 0 #374151,
+    -4px 8px 0 0 #374151,
+    0 8px 0 0 #374151,
+    4px 8px 0 0 #374151,
+    8px 8px 0 0 #374151,
+    12px 8px 0 0 #374151,
+    16px 8px 0 0 #374151,
+    20px 8px 0 0 #374151,
+    24px 8px 0 0 #374151,
+    -8px 12px 0 0 #374151,
+    -4px 12px 0 0 #374151,
+    0 12px 0 0 #0f172a,
+    4px 12px 0 0 #374151,
+    8px 12px 0 0 #f8fafc,
+    12px 12px 0 0 #374151,
+    16px 12px 0 0 #0f172a,
+    20px 12px 0 0 #374151,
+    24px 12px 0 0 #374151,
+    -4px 16px 0 0 #374151,
+    0 16px 0 0 #374151,
+    4px 16px 0 0 #374151,
+    8px 16px 0 0 #374151,
+    12px 16px 0 0 #374151,
+    16px 16px 0 0 #374151,
+    20px 16px 0 0 #374151,
+    0 20px 0 0 #374151,
+    4px 20px 0 0 #374151,
+    8px 20px 0 0 #374151,
+    12px 20px 0 0 #374151,
+    16px 20px 0 0 #374151,
+    4px 24px 0 0 #374151,
+    8px 24px 0 0 #374151,
+    12px 24px 0 0 #374151,
+    24px 16px 0 0 #1f2937,
+    24px 20px 0 0 #1f2937,
+    20px 24px 0 0 #1f2937,
+    20px 28px 0 0 #1f2937;
 }
 
 /* burbuja encima de la mascota */
