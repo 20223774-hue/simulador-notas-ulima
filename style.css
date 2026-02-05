@@ -718,6 +718,13 @@ tbody tr:hover td{ background:var(--hover); }
   transition: transform 220ms linear, left 520ms ease, bottom 240ms ease, opacity 400ms ease;
   will-change: transform, left, opacity;
   display:block;
+  --cat-outline:#2a201a;
+  --cat-fur:#7b6a5c;
+  --cat-fur-dark:#5f5348;
+  --cat-cream:#d6c7b4;
+  --cat-cream-light:#efe2d1;
+  --cat-nose:#f08b8b;
+  --cat-eye:#1f1410;
 }
 
 #mascota::after{
@@ -735,60 +742,82 @@ tbody tr:hover td{ background:var(--hover); }
 
 #mascota .cat{
   position:absolute;
-  top:6px;
+  top:8px;
   left:6px;
   width:4px;
   height:4px;
-  background:#1f2937;
+  background:var(--cat-outline);
   border-radius:1px;
   transform: translateY(0) scaleX(var(--cat-dir, 1));
   transform-origin:center;
   image-rendering: pixelated;
   box-shadow:
-    16px 0 0 0 #1f2937,
-    -4px 4px 0 0 #1f2937,
-    0 4px 0 0 #1f2937,
-    4px 4px 0 0 #1f2937,
-    12px 4px 0 0 #1f2937,
-    16px 4px 0 0 #1f2937,
-    20px 4px 0 0 #1f2937,
-    -8px 8px 0 0 #374151,
-    -4px 8px 0 0 #374151,
-    0 8px 0 0 #374151,
-    4px 8px 0 0 #374151,
-    8px 8px 0 0 #374151,
-    12px 8px 0 0 #374151,
-    16px 8px 0 0 #374151,
-    20px 8px 0 0 #374151,
-    24px 8px 0 0 #374151,
-    -8px 12px 0 0 #374151,
-    -4px 12px 0 0 #374151,
-    0 12px 0 0 #0f172a,
-    4px 12px 0 0 #374151,
-    8px 12px 0 0 #f8fafc,
-    12px 12px 0 0 #374151,
-    16px 12px 0 0 #0f172a,
-    20px 12px 0 0 #374151,
-    24px 12px 0 0 #374151,
-    -4px 16px 0 0 #374151,
-    0 16px 0 0 #374151,
-    4px 16px 0 0 #374151,
-    8px 16px 0 0 #374151,
-    12px 16px 0 0 #374151,
-    16px 16px 0 0 #374151,
-    20px 16px 0 0 #374151,
-    0 20px 0 0 #374151,
-    4px 20px 0 0 #374151,
-    8px 20px 0 0 #374151,
-    12px 20px 0 0 #374151,
-    16px 20px 0 0 #374151,
-    4px 24px 0 0 #374151,
-    8px 24px 0 0 #374151,
-    12px 24px 0 0 #374151,
-    24px 16px 0 0 #1f2937,
-    24px 20px 0 0 #1f2937,
-    20px 24px 0 0 #1f2937,
-    20px 28px 0 0 #1f2937;
+    4px 0 0 0 var(--cat-outline),
+    8px 0 0 0 var(--cat-outline),
+    12px 0 0 0 var(--cat-outline),
+    20px 0 0 0 var(--cat-outline),
+    24px 0 0 0 var(--cat-outline),
+    0 4px 0 0 var(--cat-outline),
+    4px 4px 0 0 var(--cat-fur-dark),
+    8px 4px 0 0 var(--cat-fur),
+    12px 4px 0 0 var(--cat-fur-dark),
+    16px 4px 0 0 var(--cat-outline),
+    20px 4px 0 0 var(--cat-fur-dark),
+    24px 4px 0 0 var(--cat-fur),
+    28px 4px 0 0 var(--cat-outline),
+    -4px 8px 0 0 var(--cat-outline),
+    0 8px 0 0 var(--cat-fur-dark),
+    4px 8px 0 0 var(--cat-fur),
+    8px 8px 0 0 var(--cat-fur),
+    12px 8px 0 0 var(--cat-fur),
+    16px 8px 0 0 var(--cat-fur-dark),
+    20px 8px 0 0 var(--cat-fur),
+    24px 8px 0 0 var(--cat-fur),
+    28px 8px 0 0 var(--cat-fur-dark),
+    32px 8px 0 0 var(--cat-outline),
+    -4px 12px 0 0 var(--cat-outline),
+    0 12px 0 0 var(--cat-fur),
+    4px 12px 0 0 var(--cat-cream),
+    8px 12px 0 0 var(--cat-cream),
+    12px 12px 0 0 var(--cat-fur),
+    16px 12px 0 0 var(--cat-outline),
+    20px 12px 0 0 var(--cat-cream),
+    24px 12px 0 0 var(--cat-cream),
+    28px 12px 0 0 var(--cat-fur),
+    32px 12px 0 0 var(--cat-outline),
+    -4px 16px 0 0 var(--cat-outline),
+    0 16px 0 0 var(--cat-fur),
+    4px 16px 0 0 var(--cat-cream),
+    8px 16px 0 0 var(--cat-cream-light),
+    12px 16px 0 0 var(--cat-cream),
+    16px 16px 0 0 var(--cat-fur),
+    20px 16px 0 0 var(--cat-cream),
+    24px 16px 0 0 var(--cat-cream-light),
+    28px 16px 0 0 var(--cat-cream),
+    32px 16px 0 0 var(--cat-outline),
+    0 20px 0 0 var(--cat-outline),
+    4px 20px 0 0 var(--cat-fur),
+    8px 20px 0 0 var(--cat-fur),
+    12px 20px 0 0 var(--cat-cream),
+    16px 20px 0 0 var(--cat-cream),
+    20px 20px 0 0 var(--cat-fur),
+    24px 20px 0 0 var(--cat-fur),
+    28px 20px 0 0 var(--cat-outline),
+    4px 24px 0 0 var(--cat-outline),
+    8px 24px 0 0 var(--cat-fur),
+    12px 24px 0 0 var(--cat-fur),
+    16px 24px 0 0 var(--cat-fur),
+    20px 24px 0 0 var(--cat-fur),
+    24px 24px 0 0 var(--cat-outline),
+    8px 28px 0 0 var(--cat-outline),
+    12px 28px 0 0 var(--cat-fur),
+    16px 28px 0 0 var(--cat-fur),
+    20px 28px 0 0 var(--cat-outline),
+    12px 32px 0 0 var(--cat-outline),
+    16px 32px 0 0 var(--cat-outline),
+    6px 10px 0 0 var(--cat-eye),
+    22px 10px 0 0 var(--cat-eye),
+    14px 14px 0 0 var(--cat-nose);
 }
 
 #mascota .cat::before{
@@ -796,14 +825,15 @@ tbody tr:hover td{ background:var(--hover); }
   position:absolute;
   width:4px;
   height:4px;
-  background:#111827;
+  background:var(--cat-outline);
   border-radius:1px;
   left:-8px;
-  top:16px;
+  top:20px;
   box-shadow:
-    -4px 4px 0 0 #1f2937,
-    -8px 8px 0 0 #1f2937,
-    -4px 8px 0 0 #111827;
+    -4px 4px 0 0 var(--cat-fur),
+    -8px 8px 0 0 var(--cat-fur),
+    -12px 12px 0 0 var(--cat-fur-dark),
+    -8px 16px 0 0 var(--cat-outline);
 }
 
 #mascota .cat::after{
@@ -811,31 +841,31 @@ tbody tr:hover td{ background:var(--hover); }
   position:absolute;
   width:4px;
   height:4px;
-  background:#0f172a;
+  background:var(--cat-outline);
   border-radius:1px;
   left:4px;
   top:28px;
   box-shadow:
-    12px 0 0 0 #0f172a,
-    20px 0 0 0 #0f172a,
-    8px 4px 0 0 #0f172a,
-    16px 4px 0 0 #0f172a;
+    8px 0 0 0 var(--cat-outline),
+    16px 0 0 0 var(--cat-outline),
+    4px 4px 0 0 var(--cat-fur-dark),
+    12px 4px 0 0 var(--cat-fur-dark);
 }
 
 #mascota.walking .cat{
-  animation: cat-bob 420ms steps(2, end) infinite;
+  animation: cat-bob 360ms steps(2, end) infinite;
 }
 
 #mascota.walking .cat::after{
-  animation: paw-step 420ms steps(2, end) infinite;
+  animation: paw-step 360ms steps(2, end) infinite;
 }
 
 #mascota.walking .cat::before{
-  animation: tail-wag 700ms ease-in-out infinite;
+  animation: tail-wag 520ms ease-in-out infinite;
 }
 
 #mascota.walking::after{
-  animation: shadow-pulse 420ms steps(2, end) infinite;
+  animation: shadow-pulse 360ms steps(2, end) infinite;
 }
 
 @keyframes cat-bob{
@@ -845,14 +875,35 @@ tbody tr:hover td{ background:var(--hover); }
 }
 
 @keyframes paw-step{
-  0%{ transform: translateY(0); }
-  50%{ transform: translateY(2px); }
-  100%{ transform: translateY(0); }
+  0%{
+    transform: translateY(0);
+    box-shadow:
+      8px 0 0 0 var(--cat-outline),
+      16px 0 0 0 var(--cat-outline),
+      4px 4px 0 0 var(--cat-fur-dark),
+      12px 4px 0 0 var(--cat-fur-dark);
+  }
+  50%{
+    transform: translateY(1px);
+    box-shadow:
+      6px -1px 0 0 var(--cat-outline),
+      18px 1px 0 0 var(--cat-outline),
+      2px 3px 0 0 var(--cat-fur-dark),
+      14px 5px 0 0 var(--cat-fur-dark);
+  }
+  100%{
+    transform: translateY(0);
+    box-shadow:
+      8px 0 0 0 var(--cat-outline),
+      16px 0 0 0 var(--cat-outline),
+      4px 4px 0 0 var(--cat-fur-dark),
+      12px 4px 0 0 var(--cat-fur-dark);
+  }
 }
 
 @keyframes tail-wag{
   0%{ transform: translateY(0); }
-  50%{ transform: translateY(-1px) translateX(-1px); }
+  50%{ transform: translateY(-1px) translateX(-2px) rotate(-6deg); }
   100%{ transform: translateY(0); }
 }
 
