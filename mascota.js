@@ -9,9 +9,10 @@
     if (!masc || !burbuja) return;
 
     // Estado interno
+    const MASCOTA_SIZE = 52;
     let x = parseFloat(localStorage.getItem('mascota-x')) || 20; // px
     let bottom = parseFloat(localStorage.getItem('mascota-bottom')) || 120; // px
-    let speed = 0.7 + Math.random() * 0.8; // px per frame unit
+    let speed = 0.25 + Math.random() * 0.35; // px per frame unit (más lento)
     let dir = 1; // 1 derecha, -1 izquierda
     let sleeping = false;
     let docked = false; // si está "subido" a un botón
@@ -34,7 +35,7 @@
 
     // Inicializar posición y estilos (solo lectura sobre capas existentes)
     function applyPos(){
-      masc.style.left = Math.max(6, Math.min(window.innerWidth - 46, x)) + "px";
+      masc.style.left = Math.max(6, Math.min(window.innerWidth - MASCOTA_SIZE, x)) + "px";
       masc.style.bottom = bottom + "px";
     }
     applyPos();
@@ -48,11 +49,15 @@
     // Animación de andar
     function step(){
       if (!sleeping && !docked){
-        x += dir * speed * (1 + Math.random() * 0.2) * 1.2;
+        masc.classList.add('walking');
+        x += dir * speed * (1 + Math.random() * 0.15);
         // bordes
         if (x < 6) { x = 6; dir = 1; }
-        if (x > window.innerWidth - 46) { x = window.innerWidth - 46; dir = -1; }
+        if (x > window.innerWidth - MASCOTA_SIZE) { x = window.innerWidth - MASCOTA_SIZE; dir = -1; }
+        masc.style.setProperty('--cat-dir', dir === 1 ? 1 : -1);
         applyPos();
+      } else {
+        masc.classList.remove('walking');
       }
       // Guardar periódicamente
       if (Date.now() - lastSave > SAVE_EVERY_MS){
@@ -124,7 +129,7 @@
       return function(){
         try {
           const r = btn.getBoundingClientRect();
-          const targetX = Math.max(6, Math.min(window.innerWidth - 46, r.left + (r.width/2) - 20));
+          const targetX = Math.max(6, Math.min(window.innerWidth - MASCOTA_SIZE, r.left + (r.width/2) - 20));
           // "subirse"
           docked = true;
           masc.classList.add('subido');
@@ -132,7 +137,7 @@
           // compute bottom so it looks "on top" of button: distance from bottom of viewport
           const computedBottom = Math.max(56, window.innerHeight - r.top + 8);
           // apply movement
-          masc.style.transition = "left 300ms ease, bottom 260ms ease, transform 180ms ease";
+          masc.style.transition = "left 360ms ease, bottom 260ms ease, transform 180ms ease";
           x = targetX;
           bottom = computedBottom;
           applyPos();
@@ -145,7 +150,7 @@
       return function(){
         // volver a caminar después de pequeño delay
         masc.classList.remove('subido');
-        masc.style.transition = "left 400ms ease, bottom 260ms ease, transform 180ms ease";
+        masc.style.transition = "left 520ms ease, bottom 260ms ease, transform 180ms ease";
         // restablecer bottom al valor guardado (120 default)
         bottom = parseFloat(localStorage.getItem('mascota-bottom')) || 120;
         docked = false;
@@ -199,7 +204,7 @@
 
     // Reiniciar posición si se redimensiona (ajustar límites)
     window.addEventListener('resize', function(){
-      x = Math.max(6, Math.min(window.innerWidth - 46, x));
+      x = Math.max(6, Math.min(window.innerWidth - MASCOTA_SIZE, x));
       applyPos();
     }, { passive:true });
 
