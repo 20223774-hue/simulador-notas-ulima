@@ -709,25 +709,41 @@ tbody tr:hover td{ background:var(--hover); }
    ------------------------- */
 #mascota{
   position:fixed;            /* fijo sobre toda la página */
-  width:46px;
-  height:46px;
+  width:52px;
+  height:52px;
   bottom:120px;              /* valor inicial - se ajusta por JS */
   left:20px;                 /* valor inicial - se ajusta por JS */
   z-index:9999;              /* z-index alto */
   pointer-events:none;       /* NO debe bloquear inputs ni botones */
-  transition: transform 220ms linear, left 400ms ease, bottom 220ms ease, opacity 400ms ease;
+  transition: transform 220ms linear, left 520ms ease, bottom 240ms ease, opacity 400ms ease;
   will-change: transform, left, opacity;
   display:block;
 }
 
+#mascota::after{
+  content:"";
+  position:absolute;
+  left:8px;
+  right:8px;
+  bottom:6px;
+  height:6px;
+  border-radius:50%;
+  background: rgba(15,23,42,0.18);
+  filter: blur(2px);
+  opacity:0.6;
+}
+
 #mascota .cat{
   position:absolute;
-  top:5px;
-  left:5px;
+  top:6px;
+  left:6px;
   width:4px;
   height:4px;
   background:#1f2937;
   border-radius:1px;
+  transform: translateY(0) scaleX(var(--cat-dir, 1));
+  transform-origin:center;
+  image-rendering: pixelated;
   box-shadow:
     16px 0 0 0 #1f2937,
     -4px 4px 0 0 #1f2937,
@@ -773,6 +789,77 @@ tbody tr:hover td{ background:var(--hover); }
     24px 20px 0 0 #1f2937,
     20px 24px 0 0 #1f2937,
     20px 28px 0 0 #1f2937;
+}
+
+#mascota .cat::before{
+  content:"";
+  position:absolute;
+  width:4px;
+  height:4px;
+  background:#111827;
+  border-radius:1px;
+  left:-8px;
+  top:16px;
+  box-shadow:
+    -4px 4px 0 0 #1f2937,
+    -8px 8px 0 0 #1f2937,
+    -4px 8px 0 0 #111827;
+}
+
+#mascota .cat::after{
+  content:"";
+  position:absolute;
+  width:4px;
+  height:4px;
+  background:#0f172a;
+  border-radius:1px;
+  left:4px;
+  top:28px;
+  box-shadow:
+    12px 0 0 0 #0f172a,
+    20px 0 0 0 #0f172a,
+    8px 4px 0 0 #0f172a,
+    16px 4px 0 0 #0f172a;
+}
+
+#mascota.walking .cat{
+  animation: cat-bob 420ms steps(2, end) infinite;
+}
+
+#mascota.walking .cat::after{
+  animation: paw-step 420ms steps(2, end) infinite;
+}
+
+#mascota.walking .cat::before{
+  animation: tail-wag 700ms ease-in-out infinite;
+}
+
+#mascota.walking::after{
+  animation: shadow-pulse 420ms steps(2, end) infinite;
+}
+
+@keyframes cat-bob{
+  0%{ transform: translateY(0) scaleX(var(--cat-dir, 1)); }
+  50%{ transform: translateY(1px) scaleX(var(--cat-dir, 1)); }
+  100%{ transform: translateY(0) scaleX(var(--cat-dir, 1)); }
+}
+
+@keyframes paw-step{
+  0%{ transform: translateY(0); }
+  50%{ transform: translateY(2px); }
+  100%{ transform: translateY(0); }
+}
+
+@keyframes tail-wag{
+  0%{ transform: translateY(0); }
+  50%{ transform: translateY(-1px) translateX(-1px); }
+  100%{ transform: translateY(0); }
+}
+
+@keyframes shadow-pulse{
+  0%{ transform: scaleX(1); opacity:0.55; }
+  50%{ transform: scaleX(0.9); opacity:0.35; }
+  100%{ transform: scaleX(1); opacity:0.55; }
 }
 
 /* burbuja encima de la mascota */
