@@ -670,6 +670,17 @@ tbody tr:hover td{ background:var(--hover); }
   color:var(--muted);
 }
 
+.badge-total{
+  font-size:13px;
+  font-weight:600;
+  color:var(--muted);
+  text-align:right;
+}
+
+.badge-total--bad{
+  color:var(--bad);
+}
+
 /* ✅ Responsive para celular */
 @media (max-width: 900px){
   body{ padding:14px; }

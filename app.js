@@ -658,6 +658,7 @@ const horarioState = {
   badges: [],
   counter: 1
 };
+const MAX_CREDITOS_GAFETE = 21;
 
 function obtenerCursosPlaneados(){
   return new Set(horarioState.badges.flatMap(badge => badge.cursos));
@@ -749,6 +750,8 @@ function renderScheduleBadges(){
     }).join("");
 
     const empty = badge.cursos.length === 0 ? `<div class="badge-empty">Arrastra cursos aquí</div>` : "";
+    const totalCreditos = calcularCreditosGafete(badge);
+    const totalClass = totalCreditos > MAX_CREDITOS_GAFETE ? "badge-total badge-total--bad" : "badge-total";
 
     return `
         <div class="badge-card" data-badge-id="${badge.id}">
@@ -760,6 +763,7 @@ function renderScheduleBadges(){
             ${empty}
             ${cursosBadge}
           </div>
+          <div class="${totalClass}">Total: ${totalCreditos} / ${MAX_CREDITOS_GAFETE} créditos</div>
         </div>
       `;
   }).join("");
@@ -824,10 +828,19 @@ function asignarCursoAGafete(cursoId, badgeId){
     alert("No puedes colocar este curso en este ciclo. Sus requisitos, créditos o nivel deben estar completados en ciclos anteriores.");
     return;
   }
+  const curso = cursosPorId[cursoId];
+  const destino = horarioState.badges.find(badge => badge.id === badgeId);
+  if(!curso || !destino){
+    return;
+  }
+  const creditosActuales = calcularCreditosGafete(destino);
+  if(!destino.cursos.includes(cursoId) && creditosActuales + curso.creditos > MAX_CREDITOS_GAFETE){
+    alert(`Cada gafete permite hasta ${MAX_CREDITOS_GAFETE} créditos. Ajusta los cursos de este ciclo.`);
+    return;
+  }
   horarioState.badges.forEach(badge => {
     badge.cursos = badge.cursos.filter(id => id !== cursoId);
   });
-  const destino = horarioState.badges.find(badge => badge.id === badgeId);
   if(destino && !destino.cursos.includes(cursoId)){
     destino.cursos.push(cursoId);
   }
@@ -860,6 +873,13 @@ function removerCursoDeGafete(cursoId, badgeId){
   }
   badge.cursos = badge.cursos.filter(id => id !== cursoId);
   renderSchedule();
+}
+
+function calcularCreditosGafete(badge){
+  return badge.cursos.reduce((total, cursoId) => {
+    const curso = cursosPorId[cursoId];
+    return total + (curso ? curso.creditos : 0);
+  }, 0);
 }
 
 function escapeHtml(value){
