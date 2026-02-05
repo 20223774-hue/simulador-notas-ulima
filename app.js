@@ -2,10 +2,11 @@ const APROBACION = 10.5;
 const tabla = document.getElementById("tabla");
 const canvas = document.getElementById("mathCanvas");
 const ctx = canvas.getContext("2d");
-const symbols = ["∑","π","√","Δ","∫","∞","+","−","×","÷","=","x","y","z","sin","cos","tan","log","∂","≈","≠","≤","≥","λ","μ","σ","φ","β","θ","∇","1","2","3","4","5","[...placeholder...]"];
+const symbols = ["∑","π","√","Δ","∫","∞","+","−","×","÷","=","x","y","z","sin","cos","tan","log","∂","≈","≠","≤","≥","λ","μ","σ","φ","β","θ","∇","1","2","3","4","5","6","7","8","9","0","α","γ","Ω","∴","∵"];
 const particles = [];
-const maxParticles = 90;
+let maxParticles = 90;
 const mouse = { x: -9999, y: -9999, active: false };
+const canvasSize = { width: 0, height: 0 };
 
 function applyTheme(theme){
   document.documentElement.setAttribute("data-theme", theme);
@@ -26,20 +27,21 @@ function toggleTheme(){
 })();
 
 function resizeCanvas(){
-  const rect = canvas.parentElement.getBoundingClientRect();
   const ratio = window.devicePixelRatio || 1;
-  canvas.width = rect.width * ratio;
-  canvas.height = rect.height * ratio;
-  canvas.style.width = `${rect.width}px`;
-  canvas.style.height = `${rect.height}px`;
+  canvasSize.width = window.innerWidth;
+  canvasSize.height = window.innerHeight;
+  canvas.width = canvasSize.width * ratio;
+  canvas.height = canvasSize.height * ratio;
+  canvas.style.width = `${canvasSize.width}px`;
+  canvas.style.height = `${canvasSize.height}px`;
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  maxParticles = Math.max(90, Math.round((canvasSize.width * canvasSize.height) / 9000));
 }
 
 function createParticle(){
-  const rect = canvas.getBoundingClientRect();
   return {
-    x: Math.random() * rect.width,
-    y: Math.random() * -rect.height,
+    x: Math.random() * canvasSize.width,
+    y: Math.random() * -canvasSize.height,
     speed: 0.3 + Math.random() * 1.4,
     size: 10 + Math.random() * 14,
     symbol: symbols[Math.floor(Math.random() * symbols.length)],
@@ -48,8 +50,7 @@ function createParticle(){
 }
 
 function updateParticles(){
-  const rect = canvas.getBoundingClientRect();
-  ctx.clearRect(0, 0, rect.width, rect.height);
+  ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
   ctx.font = "14px system-ui, sans-serif";
 
   particles.forEach(p => {
@@ -61,9 +62,9 @@ function updateParticles(){
       p.x += dx * 0.008;
       p.y += dy * 0.008;
     }
-    if(p.y > rect.height + 20){
+    if(p.y > canvasSize.height + 20){
       p.y = -20;
-      p.x = Math.random() * rect.width;
+      p.x = Math.random() * canvasSize.width;
     }
 
     ctx.save();
