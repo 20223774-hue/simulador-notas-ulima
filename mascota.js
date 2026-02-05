@@ -23,15 +23,89 @@
     let lastMouseMove = Date.now();
 
     // Mensajes
-    const msgs = [
-      "¡Hola!",
-      "¿Listo para simular?",
-      "¡Buena suerte!",
-      "No olvides guardar",
-      "Casi listo...",
-      "¡Ánimo!",
-      "Zzz..."
-    ];
+    const msgs = (function buildMessages(){
+      const saludos = [
+        "¡Hola!",
+        "¡Hey!",
+        "¡Buenas!",
+        "¡Ey!",
+        "¡Hola de nuevo!",
+        "¡Qué tal!",
+        "¡Listo!",
+        "¡Ánimo!",
+        "¡Vamos!",
+        "¡Buen día!",
+        "¡Buen estudio!",
+        "¡A simular!"
+      ];
+      const acciones = [
+        "simula",
+        "revisa",
+        "compara",
+        "ajusta",
+        "actualiza",
+        "guarda",
+        "ordena",
+        "calcula",
+        "valida",
+        "planifica",
+        "proyecta",
+        "optimiza"
+      ];
+      const objetivos = [
+        "tus notas",
+        "tu promedio",
+        "tus créditos",
+        "tu avance",
+        "tu ciclo",
+        "tu carga académica",
+        "tu calendario",
+        "tu plan",
+        "tu proyección",
+        "tu estrategia",
+        "tu simulación",
+        "tus cursos"
+      ];
+      const complementos = [
+        "en el simulador",
+        "para el siguiente ciclo",
+        "antes de guardar",
+        "con calma",
+        "paso a paso",
+        "con datos reales",
+        "con criterio",
+        "sin apuros",
+        "con enfoque",
+        "con claridad",
+        "con detalle",
+        "a tu ritmo"
+      ];
+      const consejos = [
+        "Tip: guarda tu progreso antes de salir.",
+        "Tip: verifica los créditos de cada curso.",
+        "Tip: prueba distintos escenarios.",
+        "Tip: ajusta el promedio objetivo.",
+        "Tip: revisa los cursos desaprobados.",
+        "Tip: compara cargas antes de decidir.",
+        "Tip: planifica el ciclo con tiempo.",
+        "Tip: valida tus notas finales.",
+        "Tip: prioriza los cursos clave.",
+        "Tip: revisa el total de créditos."
+      ];
+      const messages = [];
+      saludos.forEach((saludo) => {
+        acciones.forEach((accion) => {
+          objetivos.forEach((objetivo) => {
+            complementos.forEach((complemento) => {
+              messages.push(`${saludo} ${accion} ${objetivo} ${complemento}.`);
+            });
+          });
+        });
+      });
+      consejos.forEach((consejo) => messages.push(consejo));
+      messages.push("Zzz...");
+      return messages;
+    })();
 
     // Inicializar posición y estilos (solo lectura sobre capas existentes)
     function applyPos(){
